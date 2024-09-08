@@ -89,10 +89,6 @@ class Board
         delete_old_pieces_after_moving(old_x,old_y)
     end
 
-    def delete_old_pieces_after_moving(old_x,old_y)
-        #deleting the old rook from the board
-        board[old_x][old_y]="   ".colorize(background: color_piece(old_x,old_y))
-    end
 
     def pieces
         @pieces.each do |items|
