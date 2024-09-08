@@ -65,7 +65,7 @@ describe Board do
 
             it 'outputs an error' do
                 solution=mother_class.is_legal?(error[0],error[1])
-                expect(solution).to eq('Comparison of integer with String/Array/Symbol failed!')
+                expect(solution).to eq('comparison of String with 0 failed')
             end
         end
     end

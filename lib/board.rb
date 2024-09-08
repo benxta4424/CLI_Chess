@@ -51,9 +51,53 @@ class Board
             return false
         else
             raise ArgumentError
-     
         end
+    end
 
+    def colorize_square(piece,first_ind,second_ind)
+        piece.colorize(background: color_piece(first_ind,second_ind))
+    end
+
+    def add_pieces(add_x,add_y)
+        #black_rooks
+        first_black_rook=Rook.new('black')
+        @pieces[add_x][add_y]=first_black_rook
+        board[add_x][add_y]= first_black_rook.symbol.colorize(background: color_piece(add_x,add_y))
+
+    end
+
+    def move_pieces(old_position,new_position)
+
+        old_x=old_position[0]
+        old_y=old_position[1]
+
+        new_x=new_position[0]
+        new_y=new_position[1]
+
+        #move the rook on the board
+        first_black_rook=@pieces[old_x][old_y]
+        first_black_rook.move_front(board,[old_x,old_y],[new_x,new_y])
+        board[new_x][new_y]= first_black_rook.symbol.colorize(background: color_piece(new_x,new_y))
+
+        
+
+        #move the index in the pieces array
+        @pieces[old_x][old_y]=nil
+        @pieces[new_x][new_y]=first_black_rook
+
+        #deleting the old rook from the board
+        delete_old_pieces_after_moving(old_x,old_y)
+    end
+
+    def delete_old_pieces_after_moving(old_x,old_y)
+        #deleting the old rook from the board
+        board[old_x][old_y]="   ".colorize(background: color_piece(old_x,old_y))
+    end
+
+    def pieces
+        @pieces.each do |items|
+            puts items.join
+        end
     end
 
 end
