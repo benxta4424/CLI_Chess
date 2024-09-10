@@ -93,6 +93,24 @@ class Board
     possible_moves=piece.possible_moves(x_choice,y_choice)
   end
 
+  def visualising_possible_moves(x_choice,y_choice)
+    piece_possible_moves(x_choice,y_choice).each do |items|
+      current_x=items[0]
+      current_y=items[1]
+
+      board[current_x][current_y]="#{@pieces[current_x][current_y]}".colorize(background: :red)
+    end
+  end
+
+  def re_apply_color(x_choice,y_choice)
+    piece_possible_moves(x_choice,y_choice).each do |items|
+      current_x=items[0]
+      current_y=items[1]
+
+      board[current_x][current_y]="#{@pieces[current_x][current_y]}".colorize(background: color_piece(current_x,current_y))
+    end
+  end
+
   def pieces
     @pieces.each do |items|
       puts items.join
