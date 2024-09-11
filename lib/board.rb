@@ -9,6 +9,7 @@ class Board
     @first_color = :light_white
     @second_color = :green
     @pieces = Array.new(8) { Array.new(8) }
+    @captured_piece = []
   end
 
   def draw_board
@@ -74,6 +75,8 @@ class Board
     current_piece.move_front(board, [old_x, old_y], [new_x, new_y])
     board[new_x][new_y] = current_piece.symbol.colorize(background: color_piece(new_x, new_y))
 
+    @captured_piece << current_piece.symbol unless @pieces[new_x][new_y].nil?
+
     # move the index in the pieces array
     @pieces[old_x][old_y] = nil
     @pieces[new_x][new_y] = current_piece
@@ -87,28 +90,53 @@ class Board
     board[old_x][old_y] = "   ".colorize(background: color_piece(old_x, old_y))
   end
 
-  def piece_possible_moves(x_choice,y_choice)
-    piece=@pieces[x_choice][y_choice]
+  def piece_possible_moves(x_choice, y_choice)
+    piece = @pieces[x_choice][y_choice]
 
-    possible_moves=piece.possible_moves(x_choice,y_choice)
+    possible_moves = piece.possible_moves(x_choice, y_choice)
   end
 
-  def visualising_possible_moves(x_choice,y_choice)
-    piece_possible_moves(x_choice,y_choice).each do |items|
-      current_x=items[0]
-      current_y=items[1]
+  def visualising_possible_moves(x_choice, y_choice)
+    piece_possible_moves(x_choice, y_choice).each do |items|
+      current_x = items[0]
+      current_y = items[1]
 
-      board[current_x][current_y]="#{@pieces[current_x][current_y]}".colorize(background: :red)
+      current_piece = @pieces[x_choice][y_choice]
+
+      board[current_x][current_y] = current_piece.symbol.colorize(background: :red)
     end
   end
 
-  def re_apply_color(x_choice,y_choice)
-    piece_possible_moves(x_choice,y_choice).each do |items|
-      current_x=items[0]
-      current_y=items[1]
+  def re_apply_color(x_choice, y_choice)
+    piece_possible_moves(x_choice, y_choice).each do |items|
+      current_x = items[0]
+      current_y = items[1]
 
-      board[current_x][current_y]="#{@pieces[current_x][current_y]}".colorize(background: color_piece(current_x,current_y))
+      current_piece = @pieces[x_choice][y_choice]
+
+      board[current_x][current_y] = current_piece.symbol.colorize(background: color_piece(current_x, current_y))
     end
+  end
+
+  def saving_captured_piece
+    puts @captured_piece
+  end
+
+  def play(select_piece, next_move)
+    piece_x = select_piece[0]
+    piece_y = select_piece[1]
+
+    next_x = next_move[0]
+    next_y = next_move[1]
+
+    visualising_possible_moves(piece_x, piece_y)
+    print_board
+    re_apply_color(piece_x, piece_y)
+    move_pieces([piece_x, piece_y], [next_x, next_y])
+
+    puts
+
+    print_board
   end
 
   def pieces
