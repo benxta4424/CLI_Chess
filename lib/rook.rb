@@ -1,37 +1,42 @@
 require "colorize"
+require "./lib/piece"
+require "./lib/board"
 
-class Rook
+class Rook < Piece
   attr_accessor :color, :symbol
 
-  def initialize(color)
-    @col = color
-    @white_rook = " \u2656 "
-    @black_rook = " \u265C "
-    @symbol = color == "white" ? @white_rook : @black_rook
-  end
-
-  def check_color
-    if @col == "white"
-      @white_rook
-    elsif @col == "black"
-      @black_rook
-    end
+  def set_symbol
+    @color == "white" ? " \u2656 " : " \u265C "
   end
 
   def is_legal?(number)
     number.between?(0, 7)
   end
 
-  def possible_moves(current_x, current_y)
+  def possible_moves(pieces, current_x, current_y)
     possible_and_legal_positions = []
-    rook_movements = [[0, current_y], [7, current_y], [current_x, 0], [current_x, 7]]
+    starting_piece = pieces[current_x][current_y]
 
-    rook_movements.each do |items|
-      x_movement = items[0]
-      y_movement = items[1]
+    starting_x = current_x
+    starting_y = current_y
 
-      possible_and_legal_positions << [x_movement, y_movement] if [x_movement, y_movement] != [current_x, current_y]
+    # checking on the left side of the x axis
+    (current_x - 1).downto(0) do |x|
+      new_piece = pieces[x][current_y]
+      if !new_piece.nil?
+        if new_piece.color == starting_piece.color
+          possible_and_legal_positions << [x + 1, current_y]
+          break
+        elsif new_piece.color != starting_piece.color
+          possible_and_legal_positions << [x, current_y]
+          break
+        end
+
+      elsif new_piece.nil? && x == 0
+        possible_and_legal_positions << [0, current_y]
+      end
     end
+
 
     possible_and_legal_positions
   end
