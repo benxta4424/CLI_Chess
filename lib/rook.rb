@@ -36,7 +36,21 @@ class Rook < Piece
         possible_and_legal_positions << [0, current_y]
       end
     end
-
+    # checking on the right side of the x axis
+    (current_x + 1).upto(7) do |x|
+      new_piece = pieces[x][current_y]
+      if !new_piece.nil?
+        if new_piece.color == starting_piece.color
+          possible_and_legal_positions << [x - 1, current_y]
+          break
+        elsif new_piece.color != starting_piece.color
+          possible_and_legal_positions << [x, current_y]
+          break
+        end
+      elsif new_piece.nil? && x == 7
+        possible_and_legal_positions << [7, current_y]
+      end
+    end
 
     possible_and_legal_positions
   end
