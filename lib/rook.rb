@@ -52,6 +52,24 @@ class Rook < Piece
       end
     end
 
+    # checking upwards on the x axis
+    (current_y - 1).downto(0) do |y|
+      new_piece = pieces[current_x][y]
+      if !new_piece.nil?
+        if new_piece.color == starting_piece.color
+          possible_and_legal_positions << [current_x, y + 1]
+          break
+        elsif new_piece.color != starting_piece.color
+          possible_and_legal_positions << [current_x, y]
+          break
+        end
+    elsif new_piece.nil? && y == 0
+        possible_and_legal_positions << [current_x, 0]
+      end
+    end
+
+end
+
     possible_and_legal_positions
   end
 
