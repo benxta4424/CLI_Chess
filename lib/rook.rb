@@ -1,4 +1,3 @@
-require "colorize"
 require "./lib/piece"
 require "./lib/board"
 
@@ -85,16 +84,6 @@ class Rook < Piece
     end
 
     possible_and_legal_positions
-  end
-
-  def move_front(board, old_position, new_position)
-    old_x = old_position[0]
-    old_y = old_position[1]
-
-    new_x = new_position[0]
-    new_y = new_position[1]
-
-    board[new_x][new_y] = board[old_x][old_y]
   end
 
   def to_s

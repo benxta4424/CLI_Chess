@@ -1,5 +1,7 @@
 require "colorize"
+require "./lib/piece"
 require "./lib/rook"
+require "./lib/bishop"
 
 class Board
   attr_accessor :board, :first_color, :second_color
@@ -7,7 +9,7 @@ class Board
   def initialize
     @board = Array.new(8) { Array.new(8) }
     @first_color = :light_white
-    @second_color = :green
+    @second_color = :light_green
     @pieces = Array.new(8) { Array.new(8) }
     @captured_piece = []
   end
@@ -90,31 +92,42 @@ class Board
     board[old_x][old_y] = "   ".colorize(background: color_piece(old_x, old_y))
   end
 
+  # a selected pieces's possible moves along the board
   def piece_possible_moves(x_choice, y_choice)
     piece = @pieces[x_choice][y_choice]
 
-    possible_moves = piece.possible_moves(x_choice, y_choice)
+    possible_moves = piece.possible_moves(@pieces, x_choice, y_choice)
   end
 
+  # coloring in red the squares where a piece is elligile to move
   def visualising_possible_moves(x_choice, y_choice)
     piece_possible_moves(x_choice, y_choice).each do |items|
       current_x = items[0]
       current_y = items[1]
 
-      current_piece = @pieces[x_choice][y_choice]
+      current_piece = @pieces[current_x][current_y]
 
-      board[current_x][current_y] = current_piece.symbol.colorize(background: :red)
+      board[current_x][current_y] = if current_piece.nil?
+                                      "   ".colorize(background: :red)
+                                    else
+                                      current_piece.symbol.colorize(background: :red)
+                                    end
     end
   end
 
+  # re-coloring with the board colors the previous red colored squares
   def re_apply_color(x_choice, y_choice)
     piece_possible_moves(x_choice, y_choice).each do |items|
       current_x = items[0]
       current_y = items[1]
 
-      current_piece = @pieces[x_choice][y_choice]
+      current_piece = @pieces[current_x][current_y]
 
-      board[current_x][current_y] = current_piece.symbol.colorize(background: color_piece(current_x, current_y))
+      board[current_x][current_y] = if current_piece.nil?
+                                      "   ".colorize(background: color_piece(current_x, current_y))
+                                    else
+                                      current_piece.symbol.colorize(background: color_piece(current_x, current_y))
+                                    end
     end
   end
 
@@ -139,9 +152,15 @@ class Board
     print_board
   end
 
+  # printing the piece
   def pieces
-    @pieces.each do |items|
-      puts items.join
+    @pieces.each_with_index do |rows, _rows_ind|
+      rows.each_with_index do |_col, col_ind|
+        next if rows[col_ind].nil?
+
+        print rows[col_ind].symbol
+      end
+      puts
     end
   end
 end
