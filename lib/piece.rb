@@ -4,6 +4,7 @@ class Piece
   def initialize(col)
     @color = col
     @symbol = set_symbol
+    @possible_and_legal_positions=[]
   end
 
   def check_color
