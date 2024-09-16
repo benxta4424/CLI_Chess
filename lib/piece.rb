@@ -36,7 +36,7 @@ class Piece
 
         if !current_piece.nil?
             
-            if current_piece.color==starting_piece.color && current_piece!=starting_piece
+            if current_piece.color==starting_piece.color && x_axis!=current_x && y_axis!=current_y
                 @possible_and_legal_positions<<[x_axis-x_case,y_axis-y_case]
                 break
             elsif current_piece.color!=starting_piece.color
@@ -54,5 +54,5 @@ class Piece
     end
 
     @possible_and_legal_positions
-end
+  end
 end
