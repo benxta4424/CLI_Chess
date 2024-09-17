@@ -27,7 +27,7 @@ class Board
   def print_board
     puts "   0  1  2  3  4  5  6  7"
 
-    board.each_with_index do |row,row_ind|
+    board.each_with_index do |row, row_ind|
       print row_ind
       print " "
       print row.join
@@ -103,7 +103,6 @@ class Board
 
   # a selected pieces's possible moves along the board
   def piece_possible_moves(x_choice, y_choice)
-    
     piece = @pieces[x_choice][y_choice]
 
     possible_moves = piece.possible_moves(@pieces, x_choice, y_choice)
@@ -143,6 +142,23 @@ class Board
 
   def saving_captured_piece
     puts @captured_piece
+  end
+
+  def play(select_piece, next_move)
+    piece_x = select_piece[0]
+    piece_y = select_piece[1]
+
+    next_x = next_move[0]
+    next_y = next_move[1]
+
+    visualising_possible_moves(piece_x, piece_y)
+    print_board
+    re_apply_color(piece_x, piece_y)
+    move_pieces([piece_x, piece_y], [next_x, next_y])
+
+    puts
+
+    print_board
   end
 
   # printing the piece

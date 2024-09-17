@@ -68,11 +68,11 @@ class Pawn < Piece
     @possible_and_legal_positions
   end
 
-  def change_piece(current_x,current_y,new_piece_class)
-    if current_x==0
-      @possible_new_piece<<[new_piece_class,"white",current_x,current_y]
-    elsif current_x==7
-      @possible_new_piece<<[new_piece_class,"black",current_x,current_y]
+  def change_piece(current_x, current_y, new_piece_class)
+    if current_x == 0
+      @possible_new_piece << [new_piece_class, "white", current_x, current_y]
+    elsif current_x == 7
+      @possible_new_piece << [new_piece_class, "black", current_x, current_y]
     end
   end
 end

@@ -25,13 +25,13 @@ class Knight < Piece
       x_move = possible_x + current_x
       y_move = possible_y + current_y
 
-      #it skips over the test if the test values are not inbounds
-      next unless is_legal?(x_move,y_move)
-    
+      # it skips over the test if the test values are not inbounds
+      next unless is_legal?(x_move, y_move)
+
       possible_piece_in_the_way = pieces[x_move][y_move]
 
       if possible_piece_in_the_way.nil?
-        possible_and_legal_positions<<[x_move,y_move]
+        possible_and_legal_positions << [x_move, y_move]
       elsif possible_piece_in_the_way.color != starting_piece.color
         possible_and_legal_positions << [x_move, y_move]
       end

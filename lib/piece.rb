@@ -4,14 +4,15 @@ class Piece
   def initialize(col)
     @color = col
     @symbol = set_symbol
-    @possible_and_legal_positions=[]
+    @possible_and_legal_positions = []
+    @possible_new_piece = []
   end
 
   def check_color
     @color == "white" ? @symbol : @symbol
   end
 
-  def is_legal?(x,y)
+  def is_legal?(x, y)
     x.between?(0, 7) && y.between?(0, 7)
   end
 
@@ -25,32 +26,33 @@ class Piece
     board[new_x][new_y] = board[old_x][old_y]
   end
 
-  def get_possible_moves(pieces,current_x,current_y,x_case,y_case,starting_piece)
-    starting_piece=pieces[current_x][current_y]
+  def get_possible_moves(pieces, current_x, current_y, x_case, y_case, starting_piece)
+    starting_piece = pieces[current_x][current_y]
+    @possible_and_legal_positions.clear
 
-    x_axis=current_x+x_case
-    y_axis=current_y+y_case
+    x_axis = current_x + x_case
+    y_axis = current_y + y_case
 
-    while is_legal?(x_axis,y_axis)
-        current_piece=pieces[x_axis][y_axis]
+    while is_legal?(x_axis, y_axis)
+      current_piece = pieces[x_axis][y_axis]
 
-        if !current_piece.nil?
-            
-            if current_piece.color==starting_piece.color && x_axis!=current_x && y_axis!=current_y
-                @possible_and_legal_positions<<[x_axis-x_case,y_axis-y_case]
-                break
-            elsif current_piece.color!=starting_piece.color
-                @possible_and_legal_positions<<[x_axis,y_axis]
-                break
-            end
+      if !current_piece.nil?
 
-        elsif x_axis==7 || x_axis==0 || y_axis==7 || y_axis==0
-            @possible_and_legal_positions<<[x_axis,y_axis]
-            break
+        if current_piece.color == starting_piece.color && x_axis != current_x && y_axis != current_y
+          @possible_and_legal_positions << [x_axis - x_case, y_axis - y_case]
+          break
+        elsif current_piece.color != starting_piece.color
+          @possible_and_legal_positions << [x_axis, y_axis]
+          break
         end
 
-        x_axis+=x_case
-        y_axis+=y_case
+      elsif x_axis == 7 || x_axis == 0 || y_axis == 7 || (y_axis == 0 && x_axis != current_x && y_axis != current_y)
+        @possible_and_legal_positions << [x_axis, y_axis]
+        break
+      end
+
+      x_axis += x_case
+      y_axis += y_case
     end
 
     @possible_and_legal_positions
