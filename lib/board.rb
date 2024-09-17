@@ -1,7 +1,5 @@
 require "colorize"
 require "./lib/piece"
-require "./lib/rook"
-require "./lib/bishop"
 
 class Board
   attr_accessor :board, :first_color, :second_color
@@ -27,7 +25,18 @@ class Board
   end
 
   def print_board
-    board.each { |row| puts row.join }
+    puts "   0  1  2  3  4  5  6  7"
+
+    board.each_with_index do |row,row_ind|
+      print row_ind
+      print " "
+      print row.join
+      print " "
+      print row_ind
+      puts
+    end
+
+    puts "   0  1  2  3  4  5  6  7"
   end
 
   def pieces
@@ -72,7 +81,7 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
-    # move the rook on the board
+    # move the piece on the board
     current_piece = @pieces[old_x][old_y]
     current_piece.move_front(board, [old_x, old_y], [new_x, new_y])
     board[new_x][new_y] = current_piece.symbol.colorize(background: color_piece(new_x, new_y))
@@ -83,7 +92,7 @@ class Board
     @pieces[old_x][old_y] = nil
     @pieces[new_x][new_y] = current_piece
 
-    # deleting the old rook from the board
+    # deleting the old piece from the board
     delete_old_pieces_after_moving(old_x, old_y)
   end
 
@@ -94,6 +103,7 @@ class Board
 
   # a selected pieces's possible moves along the board
   def piece_possible_moves(x_choice, y_choice)
+    
     piece = @pieces[x_choice][y_choice]
 
     possible_moves = piece.possible_moves(@pieces, x_choice, y_choice)
@@ -133,23 +143,6 @@ class Board
 
   def saving_captured_piece
     puts @captured_piece
-  end
-
-  def play(select_piece, next_move)
-    piece_x = select_piece[0]
-    piece_y = select_piece[1]
-
-    next_x = next_move[0]
-    next_y = next_move[1]
-
-    visualising_possible_moves(piece_x, piece_y)
-    print_board
-    re_apply_color(piece_x, piece_y)
-    move_pieces([piece_x, piece_y], [next_x, next_y])
-
-    puts
-
-    print_board
   end
 
   # printing the piece
