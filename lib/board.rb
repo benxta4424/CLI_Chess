@@ -25,6 +25,10 @@ class Board
   end
 
   def print_board
+    # Clears the screen and moves the cursor to the top-left corner
+    print "\e[2J"  # Clears the entire screen
+    print "\e[H"   # Moves the cursor to the top-left corner
+
     puts "   0  1  2  3  4  5  6  7"
 
     board.each_with_index do |row, row_ind|
@@ -144,21 +148,39 @@ class Board
     puts @captured_piece
   end
 
-  def play(select_piece, next_move)
+  def play(select_piece)
     piece_x = select_piece[0]
     piece_y = select_piece[1]
-
-    next_x = next_move[0]
-    next_y = next_move[1]
-
-    visualising_possible_moves(piece_x, piece_y)
+  
+    target_position = []
+    switch = false
+  
+    loop do
+      visualising_possible_moves(piece_x, piece_y)
+      print_board
+      re_apply_color(piece_x, piece_y)
+  
+      print "add x position: "
+      next_x = gets.chomp.to_i
+      print "add y position: "
+      next_y = gets.chomp.to_i
+  
+      if valid_move?(piece_x, piece_y, next_x, next_y)
+        move_pieces([piece_x, piece_y], [next_x, next_y])
+        switch = true
+      else
+        puts "Invalid move! Try again."
+      end
+  
+      break if switch
+    end
+  
     print_board
-    re_apply_color(piece_x, piece_y)
-    move_pieces([piece_x, piece_y], [next_x, next_y])
-
-    puts
-
-    print_board
+  end
+  
+  # Helper method to validate move
+  def valid_move?(piece_x, piece_y, next_x, next_y)
+    piece_possible_moves(piece_x, piece_y).include?([next_x, next_y])
   end
 
   # printing the piece
