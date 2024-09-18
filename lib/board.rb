@@ -1,5 +1,6 @@
 require "colorize"
 require "./lib/piece"
+require "./lib/players"
 
 class Board
   attr_accessor :board, :first_color, :second_color
@@ -85,12 +86,11 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
+    @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
+
     # move the piece on the board
     current_piece = @pieces[old_x][old_y]
-    current_piece.move_front(board, [old_x, old_y], [new_x, new_y])
     board[new_x][new_y] = current_piece.symbol.colorize(background: color_piece(new_x, new_y))
-
-    @captured_piece << current_piece.symbol unless @pieces[new_x][new_y].nil?
 
     # move the index in the pieces array
     @pieces[old_x][old_y] = nil
@@ -148,36 +148,68 @@ class Board
     puts @captured_piece
   end
 
-  def play(select_piece)
-    piece_x = select_piece[0]
-    piece_y = select_piece[1]
-  
-    target_position = []
-    switch = false
-  
-    loop do
-      visualising_possible_moves(piece_x, piece_y)
-      print_board
-      re_apply_color(piece_x, piece_y)
-  
-      print "add x position: "
-      next_x = gets.chomp.to_i
-      print "add y position: "
-      next_y = gets.chomp.to_i
-  
-      if valid_move?(piece_x, piece_y, next_x, next_y)
-        move_pieces([piece_x, piece_y], [next_x, next_y])
-        switch = true
-      else
-        puts "Invalid move! Try again."
-      end
-  
-      break if switch
-    end
-  
-    print_board
+  def create_new_player(name, color)
+    Players.new(name, color)
   end
-  
+
+  def play
+    #first player
+    puts "Creating player one: "
+    print "Name: " 
+    name=gets.chomp.to_s
+    
+    puts
+
+    print "Color choice:"
+    choice=gets.chomp.to_s
+    
+    player1=Players.new(name,choice)
+
+    puts
+    puts
+
+    system("clear")
+
+  #second player
+    puts "Creating player two: "
+    print "Name: " 
+    name=gets.chomp.to_s
+    
+    puts
+
+    print "Color choice:"
+    choice=gets.chomp.to_s
+
+    player2=Players.new(name,choice)
+
+    system("clear")
+
+
+    current_player=player1
+
+      loop do
+        visualising_possible_moves(piece_x, piece_y)
+        print_board
+        re_apply_color(piece_x, piece_y)
+
+        print "add x position: "
+        next_x = gets.chomp.to_i
+        print "add y position: "
+        next_y = gets.chomp.to_i
+
+        if valid_move?(piece_x, piece_y, next_x, next_y)
+          move_pieces([piece_x, piece_y], [next_x, next_y])
+          switch = true
+        else
+          puts "Invalid move! Try again."
+        end
+
+        break if switch
+      end
+
+      print_board
+  end
+
   # Helper method to validate move
   def valid_move?(piece_x, piece_y, next_x, next_y)
     piece_possible_moves(piece_x, piece_y).include?([next_x, next_y])
