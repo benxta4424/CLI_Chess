@@ -117,7 +117,7 @@ class Board
       current_piece = @pieces[current_x][current_y]
 
       board[current_x][current_y] = if current_piece.nil?
-                                      "   ".colorize(background: :red)
+                                      " ● ".colorize(color: :red, background: color_piece(current_x, current_y))
                                     else
                                       current_piece.symbol.colorize(background: :red)
                                     end
