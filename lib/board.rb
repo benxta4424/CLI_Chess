@@ -11,6 +11,8 @@ class Board
     @second_color = :light_green
     @pieces = Array.new(8) { Array.new(8) }
     @captured_piece = []
+    @player_one=nil
+    @player_two=nil
   end
 
   def draw_board
@@ -148,67 +150,54 @@ class Board
     puts @captured_piece
   end
 
-  def create_new_player(name, color)
-    Players.new(name, color)
-  end
+  def create_players
+    colors=['white','black']
+    player_counter = 0
 
-  def play
-    #first player
-    puts "Creating player one: "
-    print "Name: " 
-    name=gets.chomp.to_s
-    
+    # first player
+    puts "Creating player ONE!\n\n"
+    print "Name: "
+    name = gets.chomp.to_s
+    print "Available colors ->  "
+
+    colors.each_with_index{|item,index| print "#{index}.#{item}   "}
     puts
 
-    print "Color choice:"
-    choice=gets.chomp.to_s
-    
-    player1=Players.new(name,choice)
+    print "Your choice:"
+    choice = gets.chomp.to_i
 
-    puts
-    puts
+    #removing the color from the array
+    colors.delete_at(choice)
 
+    case choice
+    when 0
+      choice="white"
+    when 1
+      choice="black"
+    end
+
+    @player_one = Players.new(name, choice)
     system("clear")
 
-  #second player
-    puts "Creating player two: "
-    print "Name: " 
-    name=gets.chomp.to_s
-    
-    puts
+    # second player
+    puts "Creating player TWO!\n\n"
+    print "Name: "
+    name = gets.chomp.to_s
 
-    print "Color choice:"
-    choice=gets.chomp.to_s
+    puts "The remaining color is: #{colors}"
 
-    player2=Players.new(name,choice)
-
-    system("clear")
-
-
-    current_player=player1
-
-      loop do
-        visualising_possible_moves(piece_x, piece_y)
-        print_board
-        re_apply_color(piece_x, piece_y)
-
-        print "add x position: "
-        next_x = gets.chomp.to_i
-        print "add y position: "
-        next_y = gets.chomp.to_i
-
-        if valid_move?(piece_x, piece_y, next_x, next_y)
-          move_pieces([piece_x, piece_y], [next_x, next_y])
-          switch = true
-        else
-          puts "Invalid move! Try again."
-        end
-
-        break if switch
-      end
-
-      print_board
+    #second player has no choice but to play with the color that doesn't get picked
+    @player_two = Players.new(name, colors)
   end
+
+  def play_game
+    create_players
+
+    current_player=@player_one
+
+    puts @player_two.color_choice
+  end
+
 
   # Helper method to validate move
   def valid_move?(piece_x, piece_y, next_x, next_y)
