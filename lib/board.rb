@@ -13,6 +13,10 @@ class Board
     @captured_piece = []
     @player_one=nil
     @player_two=nil
+    @king_check=0
+    @check_mate=false
+    @black_king_position=[]
+    @white_king_position=[]
   end
 
   def draw_board
@@ -88,6 +92,11 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
+    #get the kings's positions at all times
+    @black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
+
+    @white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
+
     @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
 
     # move the piece on the board
@@ -148,6 +157,15 @@ class Board
 
   def saving_captured_piece
     puts @captured_piece
+  end
+
+  def king_in_check?
+    @pieces.each_with_index do |row,row_ind|
+      row.each_with_index do |col,col_ind|
+        return true if piece_possible_moves(row_ind,col_ind).include?(@white_king_position) || piece_possible_moves(row_ind,col_ind).include?(@black_king_position)
+      end
+    end
+    false
   end
 
   def create_players
@@ -212,7 +230,6 @@ class Board
 
         print rows[col_ind].symbol
       end
-      puts
     end
   end
 end
