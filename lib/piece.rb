@@ -6,6 +6,7 @@ class Piece
     @symbol = set_symbol
     @possible_and_legal_positions = []
     @possible_new_piece = []
+    
   end
 
   def check_color
@@ -27,8 +28,6 @@ class Piece
   end
 
   def get_possible_moves(pieces, current_x, current_y, x_case, y_case, starting_piece)
-    starting_piece = pieces[current_x][current_y]
-    @possible_and_legal_positions.clear
 
     x_axis = current_x + x_case
     y_axis = current_y + y_case
@@ -38,17 +37,18 @@ class Piece
 
       if !current_piece.nil?
 
-        if current_piece.color == starting_piece.color && x_axis != current_x && y_axis != current_y
-          @possible_and_legal_positions << [x_axis - x_case, y_axis - y_case]
+        #if its a friendly piece stop before it
+        if current_piece.color == starting_piece.color
+          @possible_and_legal_positions << [x_axis-x_case, y_axis-y_case]
           break
+        #if its an enemy piece you can capture it an take its place
         elsif current_piece.color != starting_piece.color
           @possible_and_legal_positions << [x_axis, y_axis]
           break
         end
-
-      elsif x_axis == 7 || x_axis == 0 || y_axis == 7 || (y_axis == 0 && x_axis != current_x && y_axis != current_y)
+        #if its an empty square we progress forward
+      else
         @possible_and_legal_positions << [x_axis, y_axis]
-        break
       end
 
       x_axis += x_case
