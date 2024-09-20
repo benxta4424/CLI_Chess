@@ -16,8 +16,8 @@ class Board
     @king_check=0
     @white_king_checkmate=0
     @black_king_checkmate=0
-    @black_king_position=[]
-    @white_king_position=[]
+    @black_king_position=[5,6]
+    @white_king_position=[1,5]
   end
 
   def draw_board
@@ -162,15 +162,21 @@ class Board
 
   def king_in_check?(king_color)
     king_position = king_color == "white" ? @white_king_position : @black_king_position
-    
+  
     @pieces.each_with_index do |row, row_ind|
       row.each_with_index do |col, col_ind|
-        next if @pieces[row_ind][col_ind].nil? || @pieces[row_ind][col_ind].color == king_color
-        # Check if any piece can move to the king's position
-        return true if piece_possible_moves(row_ind, col_ind).include?(king_position)
+        current_piece=@pieces[row_ind][col_ind]
+
+        next if current_piece.nil? || current_piece.color==king_color
+
+        return true if piece_possible_moves(row_ind,col_ind).include?(king_position)
       end
     end
     false
+  end
+  
+
+  def check_mate?(king_color)
   end
 
   def create_players
@@ -217,10 +223,7 @@ class Board
     create_players
 
     current_player=@player_one
-
-    
   end
-
 
   # Helper method to validate move
   def valid_move?(piece_x, piece_y, next_x, next_y)
