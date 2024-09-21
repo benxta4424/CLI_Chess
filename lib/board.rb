@@ -14,8 +14,8 @@ class Board
     @player_one=nil
     @player_two=nil
     @king_check=0
-    @black_king_position=[2,2]
-    @white_king_position=[6,1]
+    @black_king_position=[0,4]
+    @white_king_position=[7,4]
   end
 
   def draw_board
@@ -65,11 +65,11 @@ class Board
 
   def is_legal?(ind_one, ind_two)
     if ind_one.between?(0, 7) && ind_two.between?(0, 7)
-      true
+      return true
     elsif !ind_one.between?(0, 7) || !ind_two.between?(0, 7)
-      false
+      return false
     else
-      raise ArgumentError
+      return false
     end
   end
 
@@ -92,9 +92,9 @@ class Board
     new_y = new_position[1]
 
     #get the kings's positions at all times
-    #@black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
+    @black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
 
-    #@white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
+    @white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
 
     @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
 
@@ -214,11 +214,11 @@ class Board
     puts "Creating player ONE!\n\n"
     print "Name: "
     name = gets.chomp.to_s
-    print "Available colors ->  "
+    print "Available colors:  \n"
 
-    colors.each_with_index{|item,index| print "#{index}.#{item}   "}
-    puts
+    colors.each_with_index{|item,index| puts "\n#{index}.#{item}"}
 
+    puts puts 
     print "Your choice:"
     choice = gets.chomp.to_i
 
@@ -243,13 +243,42 @@ class Board
     puts "The remaining color is: #{colors}"
 
     #second player has no choice but to play with the color that doesn't get picked
-    @player_two = Players.new(name, colors)
+    @player_two = Players.new(name, colors[0])
+
+    system("clear")
   end
 
   def play_game
+
     create_players
 
     current_player=@player_one
+
+    piece_choice=nil
+
+    until check_mate?(current_player.color_choice) 
+
+      #first choice + board print at the beggining after players's names and choices
+      print_board
+      puts "#{current_player.color_choice} is choosing\n\n"
+      x_piece,y_piece=9
+
+      until is_legal?(x_piece,y_piece)
+        print "X axis of your piece is:"
+        x_piece=gets.chomp.to_i
+
+        puts
+
+        print "Y axis of your piece is:"
+        y_piece=gets.chomp.to_i
+
+        puts
+        puts "Invalid Piece.Your choice should be between the 0-7 bounds. Try again!\n\n\n" unless is_legal?(x_piece,y_piece)
+      end
+      system("clear")
+
+      current_player = current_player == @player_one ? @player_two : @player_one
+    end
   end
 
   # Helper method to validate move
