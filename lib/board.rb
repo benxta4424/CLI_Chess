@@ -261,9 +261,11 @@ class Board
       #first choice + board print at the beggining after players's names and choices
       print_board
       puts "#{current_player.color_choice} is choosing\n\n"
+      #i chose 9 because we can't start with nil and a legal position 
       x_piece,y_piece=9
 
-      until is_legal?(x_piece,y_piece)
+      #for legal movements and respect the colors for every player turn
+      until is_legal?(x_piece,y_piece) && @pieces[x_piece][y_piece].color==current_player.color_choice
         print "X axis of your piece is:"
         x_piece=gets.chomp.to_i
 
@@ -274,8 +276,11 @@ class Board
 
         puts
         puts "Invalid Piece.Your choice should be between the 0-7 bounds. Try again!\n\n\n" unless is_legal?(x_piece,y_piece)
+        puts "Pick a piece of your color please,#{current_player.name}!\n\n" unless @pieces[x_piece][y_piece].color==current_player.color_choice
       end
       system("clear")
+
+      visualising_possible_moves(x_piece,y_piece)
 
       current_player = current_player == @player_one ? @player_two : @player_one
     end
