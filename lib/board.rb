@@ -14,10 +14,8 @@ class Board
     @player_one=nil
     @player_two=nil
     @king_check=0
-    @white_king_checkmate=0
-    @black_king_checkmate=0
-    @black_king_position=[5,6]
-    @white_king_position=[1,5]
+    @black_king_position=[2,2]
+    @white_king_position=[6,1]
   end
 
   def draw_board
@@ -94,9 +92,9 @@ class Board
     new_y = new_position[1]
 
     #get the kings's positions at all times
-    @black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
+    #@black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
 
-    @white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
+    #@white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
 
     @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
 
@@ -177,6 +175,35 @@ class Board
   
 
   def check_mate?(king_color)
+    king_position=king_color== "white" ? @white_king_position : @black_king_position
+
+    return false unless king_in_check?(king_color)
+
+    x_move,y_move=king_position
+    initial_piece=@pieces[x_move,y_move]    
+
+    piece_possible_moves(x_move,y_move).each do |items|
+
+      new_x=items[0]
+      new_y=items[1]
+
+      current_king=@pieces[x_move][y_move]
+
+      @pieces[new_x][new_y]=current_king
+      @pieces[x_move][y_move]=nil
+
+      if !king_in_check?(king_color)
+        move_pieces([new_x,new_y],[x_move,y_move])
+        return false
+      end
+
+      @pieces[new_x][new_y]=nil
+      @pieces[x_move][y_move]=current_king
+
+    end
+
+    true
+
   end
 
   def create_players
