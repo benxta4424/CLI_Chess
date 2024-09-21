@@ -92,9 +92,13 @@ class Board
     new_y = new_position[1]
 
     #get the kings's positions at all times
-    @black_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u265A "
-
-    @white_king_position=[x_position,y_position] if @pieces[x_position][y_position].symbol==" \u2654 "
+    if @pieces[old_x][old_y].is_a?(King)
+      if @pieces[old_x][old_y].color == "white"
+        @white_king_position = [new_x, new_y]
+      else
+        @black_king_position = [new_x, new_y]
+      end
+    end
 
     @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
 
@@ -193,7 +197,8 @@ class Board
       @pieces[x_move][y_move]=nil
 
       if !king_in_check?(king_color)
-        move_pieces([new_x,new_y],[x_move,y_move])
+        @pieces[new_x][new_y]=current_king
+        @pieces[x_move][y_move]=nil
         return false
       end
 
@@ -248,6 +253,11 @@ class Board
     system("clear")
   end
 
+  def chose_moves(x_or_y,name_movement)
+    print "pick your #{x_or_y} #{name_movement}:"
+    gets.chomp.to_i
+  end
+
   def play_game
 
     create_players
@@ -263,24 +273,35 @@ class Board
       puts "#{current_player.color_choice} is choosing\n\n"
       #i chose 9 because we can't start with nil and a legal position 
       x_piece,y_piece=9
+      #piece movement
+      x_move,y_move=9
 
       #for legal movements and respect the colors for every player turn
       until is_legal?(x_piece,y_piece) && @pieces[x_piece][y_piece].color==current_player.color_choice
-        print "X axis of your piece is:"
-        x_piece=gets.chomp.to_i
-
+        x_piece=chose_moves('X','piece')
         puts
-
-        print "Y axis of your piece is:"
-        y_piece=gets.chomp.to_i
+        y_piece=chose_moves('Y','piece')
 
         puts
         puts "Invalid Piece.Your choice should be between the 0-7 bounds. Try again!\n\n\n" unless is_legal?(x_piece,y_piece)
         puts "Pick a piece of your color please,#{current_player.name}!\n\n" unless @pieces[x_piece][y_piece].color==current_player.color_choice
       end
-      system("clear")
-
       visualising_possible_moves(x_piece,y_piece)
+      print_board
+      
+      until is_legal?(x_move,y_move)
+        x_move=chose_moves('X','move')
+        puts
+        y_move=chose_moves('Y','move')
+
+        puts "Invalid Move.Your choice should be between the 0-7 bounds. Try again!\n\n\n" unless is_legal?(x_move,y_move)
+      end
+
+      re_apply_color(x_piece,y_piece)
+      move_pieces([x_piece,y_piece],[x_move,y_move])
+      print_board
+
+      system("clear")
 
       current_player = current_player == @player_one ? @player_two : @player_one
     end
