@@ -17,8 +17,12 @@ class Board
     @black_king_position=[0,4]
     @white_king_position=[7,4]
 
+    #getting a legal piece from the pick_piece method
     @legal_x_axis_piece=nil
     @legal_y_axis_piece=nil
+    #getting a legal move from the pick_move method
+    @legal_x_axis_move=nil
+    @legal_y_axis_move=nil
   end
 
   def draw_board
@@ -300,6 +304,25 @@ class Board
     return true
   end
 
+  def pick_moves
+    #movement logic
+    loop do
+      x_move=chose_moves("X","move")
+      y_move=chose_moves("Y","move")
+      
+      #the selected piece can only move to certain positions and it cannot go anywhere on the map
+      unless piece_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece).include?([x_move,y_move])
+        puts "Your pick is invalid! You can only chose to go to:#{piece_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece)}"
+        next
+      end
+
+      @legal_x_axis_move=x_move
+      @legal_y_axis_move=y_move
+      break
+    end
+    true
+  end
+
   def play_game
 
     create_players
@@ -312,8 +335,6 @@ class Board
       print_board
       puts "#{@current_player.color_choice} is choosing\n\n"
 
-      x_move,y_move=999
-     
       #find a desired piece
       if pick_piece
         #after everything is in order,we can check our piece's possible movements
@@ -321,17 +342,12 @@ class Board
         print_board
       end
       
-      until is_legal?(x_move,y_move)
-        x_move=chose_moves('X','move')
-        puts
-        y_move=chose_moves('Y','move')
-
-        puts "Invalid Move.Your choice should be between the 0-7 bounds. Try again!\n\n\n" unless is_legal?(x_move,y_move)
+      #pick valid moves for the selected piece above
+      if pick_moves
+        re_apply_color(@legal_x_axis_piece,@legal_y_axis_piece)
+        move_pieces([@legal_x_axis_piece,@legal_y_axis_piece],[@legal_x_axis_move,@legal_y_axis_move])
+        print_board
       end
-
-      re_apply_color(x_piece,y_piece)
-      move_pieces([x_piece,y_piece],[x_move,y_move])
-      print_board
 
       system("clear")
 
