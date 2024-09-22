@@ -11,18 +11,18 @@ class Board
     @second_color = :light_green
     @pieces = Array.new(8) { Array.new(8) }
     @captured_piece = []
-    @player_one=nil
-    @player_two=nil
-    @current_player=nil
-    @black_king_position=[0,4]
-    @white_king_position=[7,4]
+    @player_one = nil
+    @player_two = nil
+    @current_player = nil
+    @black_king_position = [0, 4]
+    @white_king_position = [7, 4]
 
-    #getting a legal piece from the pick_piece method
-    @legal_x_axis_piece=nil
-    @legal_y_axis_piece=nil
-    #getting a legal move from the pick_move method
-    @legal_x_axis_move=nil
-    @legal_y_axis_move=nil
+    # getting a legal piece from the pick_piece method
+    @legal_x_axis_piece = nil
+    @legal_y_axis_piece = nil
+    # getting a legal move from the pick_move method
+    @legal_x_axis_move = nil
+    @legal_y_axis_move = nil
   end
 
   def draw_board
@@ -72,11 +72,11 @@ class Board
 
   def is_legal?(ind_one, ind_two)
     if ind_one.between?(0, 7) && ind_two.between?(0, 7)
-      return true
+      true
     elsif !ind_one.between?(0, 7) || !ind_two.between?(0, 7)
-      return false
+      false
     else
-      return false
+      false
     end
   end
 
@@ -98,7 +98,7 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
-    #get the kings's positions at all times
+    # get the kings's positions at all times
     if @pieces[old_x][old_y].is_a?(King)
       if @pieces[old_x][old_y].color == "white"
         @white_king_position = [new_x, new_y]
@@ -171,55 +171,51 @@ class Board
 
   def king_in_check?(king_color)
     king_position = king_color == "white" ? @white_king_position : @black_king_position
-  
+
     @pieces.each_with_index do |row, row_ind|
-      row.each_with_index do |col, col_ind|
-        current_piece=@pieces[row_ind][col_ind]
+      row.each_with_index do |_col, col_ind|
+        current_piece = @pieces[row_ind][col_ind]
 
-        next if current_piece.nil? || current_piece.color==king_color
+        next if current_piece.nil? || current_piece.color == king_color
 
-        return true if piece_possible_moves(row_ind,col_ind).include?(king_position)
+        return true if piece_possible_moves(row_ind, col_ind).include?(king_position)
       end
     end
     false
   end
-  
 
   def check_mate?(king_color)
-    king_position=king_color== "white" ? @white_king_position : @black_king_position
+    king_position = king_color == "white" ? @white_king_position : @black_king_position
 
     return false unless king_in_check?(king_color)
 
-    x_move,y_move=king_position
-    initial_piece=@pieces[x_move,y_move]    
+    x_move, y_move = king_position
+    initial_piece = @pieces[x_move, y_move]
 
-    piece_possible_moves(x_move,y_move).each do |items|
+    piece_possible_moves(x_move, y_move).each do |items|
+      new_x = items[0]
+      new_y = items[1]
 
-      new_x=items[0]
-      new_y=items[1]
+      current_king = @pieces[x_move][y_move]
 
-      current_king=@pieces[x_move][y_move]
+      @pieces[new_x][new_y] = current_king
+      @pieces[x_move][y_move] = nil
 
-      @pieces[new_x][new_y]=current_king
-      @pieces[x_move][y_move]=nil
-
-      if !king_in_check?(king_color)
-        @pieces[new_x][new_y]=current_king
-        @pieces[x_move][y_move]=nil
+      unless king_in_check?(king_color)
+        @pieces[new_x][new_y] = current_king
+        @pieces[x_move][y_move] = nil
         return false
       end
 
-      @pieces[new_x][new_y]=nil
-      @pieces[x_move][y_move]=current_king
-
+      @pieces[new_x][new_y] = nil
+      @pieces[x_move][y_move] = current_king
     end
 
     true
-
   end
 
   def create_players
-    colors=['white','black']
+    colors = %w[white black]
     player_counter = 0
 
     # first player
@@ -228,20 +224,20 @@ class Board
     name = gets.chomp.to_s
     print "Available colors:  \n"
 
-    colors.each_with_index{|item,index| puts "\n#{index}.#{item}"}
+    colors.each_with_index { |item, index| puts "\n#{index}.#{item}" }
 
-    puts puts 
+    puts puts
     print "Your choice:"
     choice = gets.chomp.to_i
 
-    #removing the color from the array
+    # removing the color from the array
     colors.delete_at(choice)
 
     case choice
     when 0
-      choice="white"
+      choice = "white"
     when 1
-      choice="black"
+      choice = "black"
     end
 
     @player_one = Players.new(name, choice)
@@ -254,98 +250,98 @@ class Board
 
     puts "The remaining color is: #{colors}"
 
-    #second player has no choice but to play with the color that doesn't get picked
+    # second player has no choice but to play with the color that doesn't get picked
     @player_two = Players.new(name, colors[0])
 
     system("clear")
   end
 
-  def chose_moves(x_or_y,name_movement)
+  def chose_moves(x_or_y, name_movement)
     print "pick your #{x_or_y} #{name_movement}:"
     gets.chomp.to_i
   end
 
   def pick_piece
-    #legal movements(1) ,logical movements(2) ,movements of the same color(3) and pieces that can move(4)
+    # legal movements(1) ,logical movements(2) ,movements of the same color(3) and pieces that can move(4)
     loop do
-      x_piece=chose_moves("X","piece")
-      y_piece=chose_moves("Y","piece")
+      x_piece = chose_moves("X", "piece")
+      y_piece = chose_moves("Y", "piece")
 
       puts
-      #1
-      unless is_legal?(x_piece,y_piece)
+      # 1
+      unless is_legal?(x_piece, y_piece)
         puts "Invalid move! Pick within 0-7 bounds\n\n"
         next
       end
 
-      check_piece=@pieces[x_piece][y_piece]
-      #2 (can't move a non existent piece)
+      check_piece = @pieces[x_piece][y_piece]
+      # 2 (can't move a non existent piece)
       if check_piece.nil?
         puts "Invalid! There is no piece at x->#{x_piece} : y->#{y_piece}!\n\n"
         next
       end
 
-      #3
+      # 3
       if check_piece.color != @current_player.color_choice
         puts "Pick a piece of your color,#{@current_player.name}!\n\n"
         next
       end
 
-      #4
-      if piece_possible_moves(x_piece,y_piece).empty?
+      # 4
+      if piece_possible_moves(x_piece, y_piece).empty?
         puts "The piece at x->#{x_piece}:y->#{y_piece} has no possible moves. Pick again!\n\n"
         next
       end
-    
-      @legal_x_axis_piece=x_piece
-      @legal_y_axis_piece=y_piece
+
+      @legal_x_axis_piece = x_piece
+      @legal_y_axis_piece = y_piece
       break
     end
-    return true
+    true
   end
 
   def pick_moves
-    #movement logic
+    # movement logic
     loop do
-      x_move=chose_moves("X","move")
-      y_move=chose_moves("Y","move")
-      
-      #the selected piece can only move to certain positions and it cannot go anywhere on the map
-      unless piece_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece).include?([x_move,y_move])
-        puts "Your pick is invalid! You can only chose to go to:#{piece_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece)}"
+      x_move = chose_moves("X", "move")
+      y_move = chose_moves("Y", "move")
+
+      # the selected piece can only move to certain positions and it cannot go anywhere on the map
+      unless piece_possible_moves(@legal_x_axis_piece, @legal_y_axis_piece).include?([x_move, y_move])
+        puts "Your pick is invalid! You can only chose to go to:#{piece_possible_moves(@legal_x_axis_piece,
+                                                                                       @legal_y_axis_piece)}"
         next
       end
 
-      @legal_x_axis_move=x_move
-      @legal_y_axis_move=y_move
+      @legal_x_axis_move = x_move
+      @legal_y_axis_move = y_move
       break
     end
     true
   end
 
   def play_game
-
     create_players
-    @current_player=@player_one
-    piece_choice=nil
+    @current_player = @player_one
+    piece_choice = nil
 
-    until check_mate?(@current_player.color_choice) 
+    until check_mate?(@current_player.color_choice)
 
-      #first choice + board print at the beggining after players's names and choices
+      # first choice + board print at the beggining after players's names and choices
       print_board
       puts "#{@current_player.color_choice} is choosing\n\n"
 
-      #find a desired piece
+      # find a desired piece
       if pick_piece
-        #after everything is in order,we can check our piece's possible movements
-        visualising_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece)
+        # after everything is in order,we can check our piece's possible movements
+        visualising_possible_moves(@legal_x_axis_piece, @legal_y_axis_piece)
         print_board
       end
-      
-      #pick valid moves for the selected piece above
+
+      # pick valid moves for the selected piece above
       if pick_moves
-        re_apply_color(@legal_x_axis_piece,@legal_y_axis_piece)
-        move_pieces([@legal_x_axis_piece,@legal_y_axis_piece],[@legal_x_axis_move,@legal_y_axis_move])
+        re_apply_color(@legal_x_axis_piece, @legal_y_axis_piece)
+        move_pieces([@legal_x_axis_piece, @legal_y_axis_piece], [@legal_x_axis_move, @legal_y_axis_move])
         print_board
       end
 

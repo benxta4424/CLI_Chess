@@ -20,6 +20,7 @@ class Queen < Piece
     get_possible_moves(pieces, current_x, current_y, -1, 1, current_piece)
     get_possible_moves(pieces, current_x, current_y, 1, -1, current_piece)
     get_possible_moves(pieces, current_x, current_y, -1, -1, current_piece)
+
     @possible_and_legal_positions
   end
 end
