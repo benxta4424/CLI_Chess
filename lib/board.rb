@@ -13,9 +13,12 @@ class Board
     @captured_piece = []
     @player_one=nil
     @player_two=nil
-    @king_check=0
+    @current_player=nil
     @black_king_position=[0,4]
     @white_king_position=[7,4]
+
+    @legal_x_axis_piece=nil
+    @legal_y_axis_piece=nil
   end
 
   def draw_board
@@ -258,56 +261,65 @@ class Board
     gets.chomp.to_i
   end
 
+  def pick_piece
+    #legal movements(1) ,logical movements(2) ,movements of the same color(3) and pieces that can move(4)
+    loop do
+      x_piece=chose_moves("X","piece")
+      y_piece=chose_moves("Y","piece")
+
+      puts
+      #1
+      unless is_legal?(x_piece,y_piece)
+        puts "Invalid move! Pick within 0-7 bounds\n\n"
+        next
+      end
+
+      check_piece=@pieces[x_piece][y_piece]
+      #2 (can't move a non existent piece)
+      if check_piece.nil?
+        puts "Invalid! There is no piece at x->#{x_piece} : y->#{y_piece}!\n\n"
+        next
+      end
+
+      #3
+      if check_piece.color != @current_player.color_choice
+        puts "Pick a piece of your color,#{@current_player.name}!\n\n"
+        next
+      end
+
+      #4
+      if piece_possible_moves(x_piece,y_piece).empty?
+        puts "The piece at x->#{x_piece}:y->#{y_piece} has no possible moves. Pick again!\n\n"
+        next
+      end
+    
+      @legal_x_axis_piece=x_piece
+      @legal_y_axis_piece=y_piece
+      break
+    end
+    return true
+  end
+
   def play_game
 
     create_players
-    current_player=@player_one
+    @current_player=@player_one
     piece_choice=nil
 
-    until check_mate?(current_player.color_choice) 
+    until check_mate?(@current_player.color_choice) 
 
       #first choice + board print at the beggining after players's names and choices
       print_board
-      puts "#{current_player.color_choice} is choosing\n\n"
-      #i chose 9 because we can't start with nil and a legal position 
-      x_piece,y_piece=9
-      #piece movement
-      x_move,y_move=9
+      puts "#{@current_player.color_choice} is choosing\n\n"
 
-      
-      #for legal movements and respect the colors for every player turn
-      loop do
-        x_piece=chose_moves('X','piece')
-        y_piece=chose_moves('Y','piece')
-        puts
-
-        unless is_legal?(x_piece,y_piece)
-          puts "Invalid move! Pick within 0-7 bounds\n\n"
-          next
-        end
-
-        check_piece=@pieces[x_piece][y_piece]
-
-        if check_piece.nil?
-          puts "Invalid! There is no piece at x->#{x_piece} : y->#{y_piece}!\n\n"
-          next
-        end
-        
-        if check_piece.color != current_player.color_choice
-          puts "Pick a piece of your color,#{current_player.name}!\n\n"
-          next
-        end
-
-        unless piece_possible_moves(x_piece,y_piece).nil?
-          puts "The piece at x->#{x_piece}:y->#{y_piece} has no possible moves. Pick again!\n\n"
-          next
-        end
-
-        break
+      x_move,y_move=999
+     
+      #find a desired piece
+      if pick_piece
+        #after everything is in order,we can check our piece's possible movements
+        visualising_possible_moves(@legal_x_axis_piece,@legal_y_axis_piece)
+        print_board
       end
-
-      visualising_possible_moves(x_piece,y_piece)
-      print_board
       
       until is_legal?(x_move,y_move)
         x_move=chose_moves('X','move')
@@ -323,7 +335,7 @@ class Board
 
       system("clear")
 
-      current_player = current_player == @player_one ? @player_two : @player_one
+      @current_player = @current_player == @player_one ? @player_two : @player_one
     end
   end
 
