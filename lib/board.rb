@@ -298,6 +298,11 @@ class Board
           next
         end
 
+        unless piece_possible_moves(x_piece,y_piece).nil?
+          puts "The piece at x->#{x_piece}:y->#{y_piece} has no possible moves. Pick again!\n\n"
+          next
+        end
+
         break
       end
 
