@@ -15,7 +15,7 @@ class Board
     @player_two = nil
     @current_player = nil
     @black_king_position = [0, 4]
-    @white_king_position = [7, 4]
+    @white_king_position = [5, 0]
 
     # getting a legal piece from the pick_piece method
     @legal_x_axis_piece = nil
@@ -320,6 +320,52 @@ class Board
     true
   end
 
+  def get_king_to_safety(king_color)
+    current_king_position = king_color == "white" ? @white_king_position : @black_king_position
+    current_x,current_y=current_king_position
+
+    while king_in_check?(king_color)
+      visualising_possible_moves(current_x,current_y)
+      print_board
+      re_apply_color(current_x,current_y)
+
+      pick_moves
+      
+      #move king to a possible position
+      move_pieces([current_x,current_y],[@legal_x_axis_move,@legal_y_axis_move])
+
+      
+
+       # If the king is no longer in check, break the loop
+      break unless king_in_check?(king_color)
+
+      # If it's checkmate, stop trying to move the king
+      if check_mate?(king_color)
+        puts "Checkmate! #{king_color.capitalize} loses!"
+        break
+      end
+      
+      current_x, current_y = @legal_x_axis_move, @legal_y_axis_move
+
+    end
+  end
+
+  def stalemate?(king_color)
+    return false if king_in_check?(king_color)
+  
+    # Check if any piece of the current player has a valid move
+    @pieces.each_with_index do |row, x|
+      row.each_with_index do |piece, y|
+        next if piece.nil? || piece.color != king_color
+  
+        return false unless piece_possible_moves(x, y).empty?
+      end
+    end
+  
+    true # If no valid moves and not in check, it's stalemate
+  end
+  
+
   def play_game
     create_players
     @current_player = @player_one
@@ -330,6 +376,11 @@ class Board
       # first choice + board print at the beggining after players's names and choices
       print_board
       puts "#{@current_player.color_choice} is choosing\n\n"
+
+      if king_in_check?(@current_player.color_choice)
+        puts "your king is in danger,make a move"
+        get_king_to_safety(@current_player.color_choice) 
+      end
 
       # find a desired piece
       if pick_piece
