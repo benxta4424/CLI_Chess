@@ -1,6 +1,13 @@
 require "colorize"
 require "./lib/piece"
 require "./lib/players"
+require "./lib/board"
+require "./lib/rook"
+require "./lib/knight"
+require "./lib/bishop"
+require "./lib/queen"
+require "./lib/pawn"
+require "./lib/king"
 
 class Board
   attr_accessor :board, :first_color, :second_color
@@ -15,7 +22,7 @@ class Board
     @player_two = nil
     @current_player = nil
     @black_king_position = [0, 4]
-    @white_king_position = [5, 0]
+    @white_king_position = [7, 4]
 
     # getting a legal piece from the pick_piece method
     @legal_x_axis_piece = nil
@@ -98,19 +105,20 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
+    @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
+
+    current_piece = @pieces[old_x][old_y]
+
     # get the kings's positions at all times
-    if @pieces[old_x][old_y].is_a?(King)
-      if @pieces[old_x][old_y].color == "white"
+    if current_piece.is_a?(King)
+      if current_piece.color == "white"
         @white_king_position = [new_x, new_y]
       else
         @black_king_position = [new_x, new_y]
       end
     end
 
-    @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
-
     # move the piece on the board
-    current_piece = @pieces[old_x][old_y]
     board[new_x][new_y] = current_piece.symbol.colorize(background: color_piece(new_x, new_y))
 
     # move the index in the pieces array
@@ -313,41 +321,17 @@ class Board
         next
       end
 
+      if @pieces[@legal_x_axis_piece][@legal_y_axis_piece].is_a?(King) && king_in_check?(@pieces[@legal_x_axis_piece][@legal_y_axis_piece])
+        puts "Move your king sunshine!!"
+        
+        next
+      end
+
       @legal_x_axis_move = x_move
       @legal_y_axis_move = y_move
       break
     end
     true
-  end
-
-  def get_king_to_safety(king_color)
-    current_king_position = king_color == "white" ? @white_king_position : @black_king_position
-    current_x,current_y=current_king_position
-
-    while king_in_check?(king_color)
-      visualising_possible_moves(current_x,current_y)
-      print_board
-      re_apply_color(current_x,current_y)
-
-      pick_moves
-      
-      #move king to a possible position
-      move_pieces([current_x,current_y],[@legal_x_axis_move,@legal_y_axis_move])
-
-      
-
-       # If the king is no longer in check, break the loop
-      break unless king_in_check?(king_color)
-
-      # If it's checkmate, stop trying to move the king
-      if check_mate?(king_color)
-        puts "Checkmate! #{king_color.capitalize} loses!"
-        break
-      end
-      
-      current_x, current_y = @legal_x_axis_move, @legal_y_axis_move
-
-    end
   end
 
   def stalemate?(king_color)
@@ -375,13 +359,8 @@ class Board
 
       # first choice + board print at the beggining after players's names and choices
       print_board
-      puts "#{@current_player.color_choice} is choosing\n\n"
-
-      if king_in_check?(@current_player.color_choice)
-        puts "your king is in danger,make a move"
-        get_king_to_safety(@current_player.color_choice) 
-      end
-
+      
+      puts "#{@current_player.name} pick a #{@current_player.color_choice} piece please\n\n"
       # find a desired piece
       if pick_piece
         # after everything is in order,we can check our piece's possible movements
@@ -396,9 +375,19 @@ class Board
         print_board
       end
 
+      puts "bobobbb" if king_in_check?(@current_player.color_choice)
+
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
+    end
+
+    if check_mate?(@current_player.color_choice)
+      if @current_player==@player_one
+        puts "Player: '#{@player_two.name}' has won via CheckMate!"
+      else
+        puts "Player: '#{@player_one.name}' has won via CheckMate!"
+      end
     end
   end
 
