@@ -49,7 +49,7 @@ class Board
     print "\e[2J"  # Clears the entire screen
     print "\e[H"   # Moves the cursor to the top-left corner
 
-    puts "   0  1  2  3  4  5  6  7"
+    puts "   A  B  C  D  E  F  G  H"
 
     board.each_with_index do |row, row_ind|
       print row_ind
@@ -60,7 +60,7 @@ class Board
       puts
     end
 
-    puts "   0  1  2  3  4  5  6  7"
+    puts "   A  B  C  D  E  F  G  H"
   end
 
   def pieces
@@ -267,6 +267,34 @@ class Board
   def chose_moves(x_or_y, name_movement)
     print "pick your #{x_or_y} #{name_movement}:"
     gets.chomp.to_i
+  end
+
+  def get_number_from_letter(x_move)
+    case x_move
+    when 'a'
+      return 0
+
+    when 'b'
+      return 1
+
+    when 'c'
+      return 2
+
+    when 'd'
+      return 3
+
+    when 'e'
+      return 4
+
+    when 'f'
+      return 5
+
+    when 'g'
+      return 6
+
+    when 'h'
+      return 7 
+    end
   end
 
   def pick_piece
