@@ -193,32 +193,33 @@ class Board
   end
 
   def check_mate?(king_color)
-    king_position = king_color == "white" ? @white_king_position : @black_king_position
-
     return false unless king_in_check?(king_color)
 
-    x_move, y_move = king_position
-    initial_piece = @pieces[x_move, y_move]
+    @pieces.each_with_index do |row,row_ind|
+      row.each_with_index do |col,col_ind|
+        next if col.nil? || col.color!=king_color
 
-    piece_possible_moves(x_move, y_move).each do |items|
-      new_x = items[0]
-      new_y = items[1]
+        piece_possible_moves(row_ind,col_ind).each do |poss_moves_per_piece|
+          new_x,new_y=poss_moves_per_piece
+          #current+future pieces
+          current_piece=@pieces[row_ind][col_ind]
+          destination_piece=@pieces[new_x][new_y]
 
-      current_king = @pieces[x_move][y_move]
+          @pieces[new_x][new_y]=current_piece
+          @pieces[row_ind][col_ind]=nil
 
-      @pieces[new_x][new_y] = current_king
-      @pieces[x_move][y_move] = nil
+          if !king_in_check?(king_color)
+            @pieces[row_ind][col_ind]=current_piece
+            @pieces[new_x][new_y]=destination_piece
 
-      unless king_in_check?(king_color)
-        @pieces[new_x][new_y] = current_king
-        @pieces[x_move][y_move] = nil
-        return false
+            return false
+          end
+
+          @pieces[row_ind][col_ind]=current_piece
+          @pieces[new_x][new_y]=destination_piece
+        end
       end
-
-      @pieces[new_x][new_y] = nil
-      @pieces[x_move][y_move] = current_king
     end
-
     true
   end
 
@@ -321,12 +322,9 @@ class Board
         next
       end
 
-      move_pieces([@legal_x_axis_piece,@legal_y_axis_piece],[x_move,y_move])
-
-      if king_in_check?(@current_player.color_choice)
-        puts "The king is still in check! Try again."
-        move_pieces([x_move,y_move],[@legal_x_axis_piece,@legal_y_axis_piece])
-
+      if @pieces[@legal_x_axis_piece][@legal_y_axis_piece].is_a?(King) && king_in_check?(@pieces[@legal_x_axis_piece][@legal_y_axis_piece])
+        puts "Move your king sunshine!!"
+        
         next
       end
 
@@ -383,15 +381,16 @@ class Board
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
-    end
 
-    if check_mate?(@current_player.color_choice)
-      if @current_player==@player_one
-        puts "Player: '#{@player_two.name}' has won via CheckMate!"
-      else
-        puts "Player: '#{@player_one.name}' has won via CheckMate!"
+      if check_mate?(@current_player.color_choice)
+        if @current_player==@player_one
+          puts "Player: '#{@player_two.name}' has won via CheckMate!"
+        else
+          puts "Player: '#{@player_one.name}' has won via CheckMate!"
+        end
       end
     end
+
   end
 
   # Helper method to validate move
