@@ -321,9 +321,12 @@ class Board
         next
       end
 
-      if @pieces[@legal_x_axis_piece][@legal_y_axis_piece].is_a?(King) && king_in_check?(@pieces[@legal_x_axis_piece][@legal_y_axis_piece])
-        puts "Move your king sunshine!!"
-        
+      move_pieces([@legal_x_axis_piece,@legal_y_axis_piece],[x_move,y_move])
+
+      if king_in_check?(@current_player.color_choice)
+        puts "The king is still in check! Try again."
+        move_pieces([x_move,y_move],[@legal_x_axis_piece,@legal_y_axis_piece])
+
         next
       end
 
