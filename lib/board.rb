@@ -175,10 +175,6 @@ class Board
     end
   end
 
-  def saving_captured_piece
-    puts @captured_piece
-  end
-
   def king_in_check?(king_color)
     king_position = king_color == "white" ? @white_king_position : @black_king_position
 
@@ -381,34 +377,32 @@ class Board
     safe_positions
   end
 
-  #since the visualisation works for existing pieces only we have to manipulate the board itself to get the visual safe positions for the king
-  def draw_colors_for_safe_king_positions(king_color,x_pos,y_pos)
-    current_piece=@pieces[x_pos][y_pos]
+  # since the visualisation works for existing pieces only we have to manipulate the board itself to get the visual safe positions for the king
+  def draw_colors_for_safe_king_positions(_king_color, x_pos, y_pos)
+    current_piece = @pieces[x_pos][y_pos]
 
-    if current_piece.nil?  # Only erase if no piece is there
-      board[x_pos][y_pos]=" ● ".colorize(color: :red, background: color_piece(x_pos, y_pos))
-    else
-      board[x_pos][y_pos] = current_piece.symbol.colorize(background: :red)
-    end
+    board[x_pos][y_pos] = if current_piece.nil? # Only erase if no piece is there
+                            " ● ".colorize(color: :red, background: color_piece(x_pos, y_pos))
+                          else
+                            current_piece.symbol.colorize(background: :red)
+                          end
   end
 
-  #as previously stated,we also have to manipulate the board itself to get rid of the positions after movement of the king
+  # as previously stated,we also have to manipulate the board itself to get rid of the positions after movement of the king
   def erase_colors_from_previous_safe_king_positions(x_pos, y_pos)
-    if @pieces[x_pos][y_pos].nil?  # Only erase if no piece is there
-      board[x_pos][y_pos] = "   ".colorize(background: color_piece(x_pos, y_pos))
-    end
+    return unless @pieces[x_pos][y_pos].nil? # Only erase if no piece is there
+
+    board[x_pos][y_pos] = "   ".colorize(background: color_piece(x_pos, y_pos))
   end
 
   def captured_pieces_per_player(player_color)
     puts "\n\n#{player_color}'s lost pieces:"
-    @captured_piece_symbol.each_with_index do |items,index|
+    @captured_piece_symbol.each_with_index do |_items, index|
       print @captured_piece_symbol[index] if @captured_piece_color[index] == player_color
     end
 
     puts
   end
-
-
 
   def play_game
     create_players
@@ -421,7 +415,12 @@ class Board
       print_board
 
       captured_pieces_per_player(@current_player.color_choice)
-      puts puts 
+      puts puts
+      
+      if stalemate?(@current_player.color_choice)
+        puts "The game is a draw!"
+        break
+      end
 
       case king_in_check?(@current_player.color_choice)
 
@@ -430,12 +429,12 @@ class Board
 
         pick_piece
 
-        escape_routes=safe_positions_for_the_king(@current_player.color_choice)
+        escape_routes = safe_positions_for_the_king(@current_player.color_choice)
 
         escape_routes.each do |moves|
-          x_position,y_position=moves
-          
-          draw_colors_for_safe_king_positions(@current_player.color_choice,x_position,y_position)
+          x_position, y_position = moves
+
+          draw_colors_for_safe_king_positions(@current_player.color_choice, x_position, y_position)
         end
 
         print_board
@@ -445,13 +444,13 @@ class Board
         move_pieces([@legal_x_axis_piece, @legal_y_axis_piece], [@legal_x_axis_move, @legal_y_axis_move])
 
         escape_routes.each do |moves|
-          x_position,y_position=moves
-          
-          erase_colors_from_previous_safe_king_positions(x_position,y_position)
+          x_position, y_position = moves
+
+          erase_colors_from_previous_safe_king_positions(x_position, y_position)
         end
 
         print_board
-      
+
       when false
         puts "#{@current_player.name} pick a #{@current_player.color_choice} piece please\n\n"
         # find a desired piece
@@ -470,23 +469,26 @@ class Board
 
       end
 
-      
-
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
 
+      #check for checkmate after the players's move
       if check_mate?(@current_player.color_choice)
         if @current_player == @player_one
           puts "Player: '#{@player_two.name}' has won via CheckMate!"
         else
           puts "Player: '#{@player_one.name}' has won via CheckMate!"
         end
+        break
+      end
+
+      if stalemate?(@current_player.color_choice)
+        puts "The game ends in a draw!"
+        break
       end
 
     end
-
-    saving_captured_piece
   end
 
   # Helper method to validate move
