@@ -17,7 +17,8 @@ class Board
     @first_color = :light_white
     @second_color = :light_green
     @pieces = Array.new(8) { Array.new(8) }
-    @captured_piece = []
+    @captured_piece_symbol = []
+    @captured_piece_color = []
     @player_one = nil
     @player_two = nil
     @current_player = nil
@@ -105,7 +106,8 @@ class Board
     new_x = new_position[0]
     new_y = new_position[1]
 
-    @captured_piece << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
+    @captured_piece_symbol << @pieces[new_x][new_y].symbol unless @pieces[new_x][new_y].nil?
+    @captured_piece_color << @pieces[new_x][new_y].color unless @pieces[new_x][new_y].nil?
 
     current_piece = @pieces[old_x][old_y]
 
@@ -382,7 +384,7 @@ class Board
   #since the visualisation works for existing pieces only we have to manipulate the board itself to get the visual safe positions for the king
   def draw_colors_for_safe_king_positions(king_color,x_pos,y_pos)
     current_piece=@pieces[x_pos][y_pos]
-    
+
     if current_piece.nil?  # Only erase if no piece is there
       board[x_pos][y_pos]=" ● ".colorize(color: :red, background: color_piece(x_pos, y_pos))
     else
@@ -397,7 +399,14 @@ class Board
     end
   end
 
+  def captured_pieces_per_player(player_color)
+    puts "\n\n#{player_color}'s lost pieces:"
+    @captured_piece_symbol.each_with_index do |items,index|
+      print @captured_piece_symbol[index] if @captured_piece_color[index] == player_color
+    end
 
+    puts
+  end
 
 
 
@@ -411,10 +420,13 @@ class Board
       # first choice + board print at the beggining after players's names and choices
       print_board
 
+      captured_pieces_per_player(@current_player.color_choice)
+      puts puts 
+
       case king_in_check?(@current_player.color_choice)
 
       when true
-        puts "\n'#{@current_player.name}' your king is in check! You have to move it otherwise you lose!"
+        puts "\n'#{@current_player.name}' your king is in check! You have to move it otherwise you lose!\n\n"
 
         pick_piece
 
@@ -458,6 +470,8 @@ class Board
 
       end
 
+      
+
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
@@ -471,6 +485,8 @@ class Board
       end
 
     end
+
+    saving_captured_piece
   end
 
   # Helper method to validate move
