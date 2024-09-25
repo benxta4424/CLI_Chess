@@ -22,7 +22,7 @@ class Board
     @player_two = nil
     @current_player = nil
     @black_king_position = [0, 4]
-    @white_king_position = [7, 4]
+    @white_king_position = [5, 0]
 
     # getting a legal piece from the pick_piece method
     @legal_x_axis_piece = nil
@@ -348,6 +348,38 @@ class Board
     end
   
     true # If no valid moves and not in check, it's stalemate
+  end
+
+  def safe_positions_for_the_king(king_color)
+    king_position=king_color=="white" ? @white_king_position : @black_king_position
+    safe_positions=[]
+
+    x_position,y_position=king_position
+    king=@pieces[x_position][y_position]
+
+    piece_possible_moves(x_position,y_position).each do |moves|
+      next_x_position,next_y_position=moves
+      current_piece=@pieces[next_x_position][next_y_position]
+
+      @pieces[x_position][y_position]=nil
+      @pieces[next_x_position][next_y_position]=king
+
+      if king_color=="white"
+        @white_king_position=[next_x_position,next_y_position]
+      else
+        @black_king_position=[next_x_position,next_y_position]
+      end
+
+      if !king_in_check?(king_color)
+        safe_positions<<[next_x_position,next_y_position]
+      end
+
+      @pieces[x_position][y_position]=king
+      @pieces[next_x_position][next_y_position]=current_piece
+
+    end
+    
+    safe_positions
   end
   
 
