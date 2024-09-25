@@ -22,7 +22,7 @@ class Board
     @player_two = nil
     @current_player = nil
     @black_king_position = [0, 4]
-    @white_king_position = [5, 0]
+    @white_king_position = [7, 4]
 
     # getting a legal piece from the pick_piece method
     @legal_x_axis_piece = nil
@@ -195,28 +195,28 @@ class Board
   def check_mate?(king_color)
     return false unless king_in_check?(king_color)
 
-    @pieces.each_with_index do |row,row_ind|
-      row.each_with_index do |col,col_ind|
-        next if col.nil? || col.color!=king_color
+    @pieces.each_with_index do |row, row_ind|
+      row.each_with_index do |col, col_ind|
+        next if col.nil? || col.color != king_color
 
-        piece_possible_moves(row_ind,col_ind).each do |poss_moves_per_piece|
-          new_x,new_y=poss_moves_per_piece
-          #current+future pieces
-          current_piece=@pieces[row_ind][col_ind]
-          destination_piece=@pieces[new_x][new_y]
+        piece_possible_moves(row_ind, col_ind).each do |poss_moves_per_piece|
+          new_x, new_y = poss_moves_per_piece
+          # current+future pieces
+          current_piece = @pieces[row_ind][col_ind]
+          destination_piece = @pieces[new_x][new_y]
 
-          @pieces[new_x][new_y]=current_piece
-          @pieces[row_ind][col_ind]=nil
+          @pieces[new_x][new_y] = current_piece
+          @pieces[row_ind][col_ind] = nil
 
-          if !king_in_check?(king_color)
-            @pieces[row_ind][col_ind]=current_piece
-            @pieces[new_x][new_y]=destination_piece
+          unless king_in_check?(king_color)
+            @pieces[row_ind][col_ind] = current_piece
+            @pieces[new_x][new_y] = destination_piece
 
             return false
           end
 
-          @pieces[row_ind][col_ind]=current_piece
-          @pieces[new_x][new_y]=destination_piece
+          @pieces[row_ind][col_ind] = current_piece
+          @pieces[new_x][new_y] = destination_piece
         end
       end
     end
@@ -324,7 +324,7 @@ class Board
 
       if @pieces[@legal_x_axis_piece][@legal_y_axis_piece].is_a?(King) && king_in_check?(@pieces[@legal_x_axis_piece][@legal_y_axis_piece])
         puts "Move your king sunshine!!"
-        
+
         next
       end
 
@@ -337,51 +337,69 @@ class Board
 
   def stalemate?(king_color)
     return false if king_in_check?(king_color)
-  
+
     # Check if any piece of the current player has a valid move
     @pieces.each_with_index do |row, x|
       row.each_with_index do |piece, y|
         next if piece.nil? || piece.color != king_color
-  
+
         return false unless piece_possible_moves(x, y).empty?
       end
     end
-  
+
     true # If no valid moves and not in check, it's stalemate
   end
 
   def safe_positions_for_the_king(king_color)
-    king_position=king_color=="white" ? @white_king_position : @black_king_position
-    safe_positions=[]
+    king_position = king_color == "white" ? @white_king_position : @black_king_position
+    safe_positions = []
 
-    x_position,y_position=king_position
-    king=@pieces[x_position][y_position]
+    x_position, y_position = king_position
+    king = @pieces[x_position][y_position]
 
-    piece_possible_moves(x_position,y_position).each do |moves|
-      next_x_position,next_y_position=moves
-      current_piece=@pieces[next_x_position][next_y_position]
+    piece_possible_moves(x_position, y_position).each do |moves|
+      next_x_position, next_y_position = moves
+      current_piece = @pieces[next_x_position][next_y_position]
 
-      @pieces[x_position][y_position]=nil
-      @pieces[next_x_position][next_y_position]=king
+      @pieces[x_position][y_position] = nil
+      @pieces[next_x_position][next_y_position] = king
 
-      if king_color=="white"
-        @white_king_position=[next_x_position,next_y_position]
+      if king_color == "white"
+        @white_king_position = [next_x_position, next_y_position]
       else
-        @black_king_position=[next_x_position,next_y_position]
+        @black_king_position = [next_x_position, next_y_position]
       end
 
-      if !king_in_check?(king_color)
-        safe_positions<<[next_x_position,next_y_position]
-      end
+      safe_positions << [next_x_position, next_y_position] unless king_in_check?(king_color)
 
-      @pieces[x_position][y_position]=king
-      @pieces[next_x_position][next_y_position]=current_piece
-
+      @pieces[x_position][y_position] = king
+      @pieces[next_x_position][next_y_position] = current_piece
     end
-    
+
     safe_positions
   end
-  
+
+  #since the visualisation works for existing pieces only we have to manipulate the board itself to get the visual safe positions for the king
+  def draw_colors_for_safe_king_positions(king_color,x_pos,y_pos)
+    current_piece=@pieces[x_pos][y_pos]
+    
+    if current_piece.nil?  # Only erase if no piece is there
+      board[x_pos][y_pos]=" ● ".colorize(color: :red, background: color_piece(x_pos, y_pos))
+    else
+      board[x_pos][y_pos] = current_piece.symbol.colorize(background: :red)
+    end
+  end
+
+  #as previously stated,we also have to manipulate the board itself to get rid of the positions after movement of the king
+  def erase_colors_from_previous_safe_king_positions(x_pos, y_pos)
+    if @pieces[x_pos][y_pos].nil?  # Only erase if no piece is there
+      board[x_pos][y_pos] = "   ".colorize(background: color_piece(x_pos, y_pos))
+    end
+  end
+
+
+
+
 
   def play_game
     create_players
@@ -392,37 +410,67 @@ class Board
 
       # first choice + board print at the beggining after players's names and choices
       print_board
-      
-      puts "#{@current_player.name} pick a #{@current_player.color_choice} piece please\n\n"
-      # find a desired piece
-      if pick_piece
-        # after everything is in order,we can check our piece's possible movements
-        visualising_possible_moves(@legal_x_axis_piece, @legal_y_axis_piece)
-        print_board
-      end
 
-      # pick valid moves for the selected piece above
-      if pick_moves
-        re_apply_color(@legal_x_axis_piece, @legal_y_axis_piece)
+      case king_in_check?(@current_player.color_choice)
+
+      when true
+        puts "\n'#{@current_player.name}' your king is in check! You have to move it otherwise you lose!"
+
+        pick_piece
+
+        escape_routes=safe_positions_for_the_king(@current_player.color_choice)
+
+        escape_routes.each do |moves|
+          x_position,y_position=moves
+          
+          draw_colors_for_safe_king_positions(@current_player.color_choice,x_position,y_position)
+        end
+
+        print_board
+
+        pick_moves
+
         move_pieces([@legal_x_axis_piece, @legal_y_axis_piece], [@legal_x_axis_move, @legal_y_axis_move])
-        print_board
-      end
 
-      puts "bobobbb" if king_in_check?(@current_player.color_choice)
+        escape_routes.each do |moves|
+          x_position,y_position=moves
+          
+          erase_colors_from_previous_safe_king_positions(x_position,y_position)
+        end
+
+        print_board
+      
+      when false
+        puts "#{@current_player.name} pick a #{@current_player.color_choice} piece please\n\n"
+        # find a desired piece
+        if pick_piece
+          # after everything is in order,we can check our piece's possible movements
+          visualising_possible_moves(@legal_x_axis_piece, @legal_y_axis_piece)
+          print_board
+        end
+
+        # pick valid moves for the selected piece above
+        if pick_moves
+          re_apply_color(@legal_x_axis_piece, @legal_y_axis_piece)
+          move_pieces([@legal_x_axis_piece, @legal_y_axis_piece], [@legal_x_axis_move, @legal_y_axis_move])
+          print_board
+        end
+
+      end
 
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
 
       if check_mate?(@current_player.color_choice)
-        if @current_player==@player_one
+        if @current_player == @player_one
           puts "Player: '#{@player_two.name}' has won via CheckMate!"
         else
           puts "Player: '#{@player_one.name}' has won via CheckMate!"
         end
       end
-    end
 
+    end
   end
 
   # Helper method to validate move
