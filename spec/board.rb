@@ -81,14 +81,29 @@ describe Board do
         expect(piece).to be_a(Queen)
         expect(piece.color).to eq(piece_color)
       end
-
-      it "should put the rooks at given positions" do
+        
+        it "should put the rooks at given positions" do
         new_board.add_pieces(Rook, piece_color,0, 0)
 
         piece = new_board.pieces[0][0]
 
         expect(piece).to be_a(Rook)
         expect(piece.color).to eq(piece_color)
+      end
+    end
+
+    context "checking added pieces's color" do
+
+      let(:piece_class) { Bishop }
+      let(:piece_color) { "black" }
+      let(:x_and_y) { [0, 2] }
+
+      it "correctly returns the pieces's color" do
+      new_board.add_pieces(piece_class,piece_color,0,2)
+
+      piece=new_board.pieces[0][2]
+
+      expect(piece.color).to eq("black")
       end
     end
 
@@ -105,5 +120,6 @@ describe Board do
         expect(piece).to eq(nil)
       end
     end
+
   end
 end
