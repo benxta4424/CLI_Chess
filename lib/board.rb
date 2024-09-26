@@ -429,6 +429,55 @@ class Board
     false
   end
 
+  def promoting_pawns
+    option=nil
+    puts "Promotiom list:"
+    puts "\u0AE7.Queen"
+    puts "\u0AE8.Rook"
+    puts "\u0AE9.Knight"
+    puts "\u0AEA.Bishop\n\n"
+
+    print "Your choice:"
+    option=gets.chomp.to_i
+    
+    case option
+    when 1
+      piece_class=Queen
+    when 2
+      piece_class=Rook
+    when 3
+      piece_class=Knight
+    when 4
+      piece_class=Bishop
+    end
+
+
+    puts
+    #black pawn promotion
+    0.upto(7) do |counter|
+      current_piece=@pieces[7][counter]
+
+      if current_piece.is_a?(Pawn) && current_piece.color == "black"
+        add_pieces(piece_class,"black",7,counter)
+        break
+      else
+        next
+      end
+    end
+
+    #white pawn promotion
+    7.downto(0) do |counter|
+      current_piece=@pieces[0][counter]
+
+      if current_piece.is_a?(Pawn) && current_piece.color == "white"
+        add_pieces(piece_class,"white",0,counter)
+        break
+      else
+        next
+      end
+    end
+  end
+
   def play_game
     create_players
     @current_player = @player_one
