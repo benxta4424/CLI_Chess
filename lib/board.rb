@@ -404,6 +404,31 @@ class Board
     puts
   end
 
+  def check_for_possible_promotions
+    0.upto(7) do |counter|
+      current_piece=@pieces[7][counter]
+
+      if current_piece.is_a?(Pawn) && current_piece.color == "black"
+        return true
+      else
+        next
+      end
+    end
+
+    #white pawn promotion
+    7.downto(0) do |counter|
+      current_piece=@pieces[0][counter]
+
+      if current_piece.is_a?(Pawn) && current_piece.color == "white"
+        return true
+      else
+        next
+      end
+    end
+
+    false
+  end
+
   def play_game
     create_players
     @current_player = @player_one
@@ -466,7 +491,6 @@ class Board
           move_pieces([@legal_x_axis_piece, @legal_y_axis_piece], [@legal_x_axis_move, @legal_y_axis_move])
           print_board
         end
-
       end
 
       system("clear")
