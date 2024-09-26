@@ -542,6 +542,8 @@ class Board
         end
       end
 
+      promoting_pawns if check_for_possible_promotions
+
       system("clear")
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
