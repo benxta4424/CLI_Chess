@@ -147,5 +147,35 @@ describe Board do
       end
     end
 
+    context "if the pieces are kings,we memorize their location" do
+
+      it "should memorize [6,4] for the white king that's currently at [7,4]" do
+        new_board.add_pieces(King,"white",7,4)
+        new_board.move_pieces([7,4],[6,4])
+        current_white_king_position=new_board.instance_variable_get(:@white_king_position)
+
+        x_pos,y_pos=current_white_king_position
+        piece=new_board.pieces[x_pos][y_pos]
+
+        expect(piece).to be_a(King)
+        expect(piece.color).to eq("white")
+
+      end
+
+      it "should memorize [1,3] for the white king that's currently at [0,3]" do
+        new_board.add_pieces(King,"black",0,3)
+        new_board.move_pieces([0,3],[1,3])
+        current_black_king_position=new_board.instance_variable_get(:@black_king_position)
+
+        x_pos,y_pos=current_black_king_position
+        piece=new_board.pieces[x_pos][y_pos]
+
+        expect(piece).to be_a(King)
+        expect(piece.color).to eq("black")
+
+      end
+
+    end
+
   end
 end
