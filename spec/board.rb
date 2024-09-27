@@ -120,6 +120,32 @@ describe Board do
         expect(piece).to eq(nil)
       end
     end
+  end
+
+  describe "#move_pieces" do
+    let(:new_board) { described_class.new }
+    let(:current_piece_location){[0,1]}
+
+    context "moving the piece to a custom location" do
+      let(:move_location){[2,1]}
+
+      it "moves the piece from 0-1 to 2-1" do
+        new_board.add_pieces(King,"white",0,1)
+        new_board.move_pieces([0,1],[2,1])
+        piece=new_board.pieces[2][1]
+
+        expect(piece).to be_a(King)
+      end
+
+      it "moves the piece from 7-7 to 7-0" do
+        new_board.add_pieces(Rook,"white",7,7)
+        new_board.move_pieces([7,7],[7,0])
+        piece=new_board.pieces[7][0]
+        
+        expect(piece).to be_a(Rook)
+        expect(piece.color).to eq("white")
+      end
+    end
 
   end
 end
