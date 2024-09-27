@@ -196,7 +196,6 @@ describe Board do
           captured_piece=new_board.instance_variable_get(:@captured_piece_symbol).join
 
           expect(captured_piece).to eq(" \u2655 ")
-
         end
 
         it "returns the Queens color for a captured piece" do
@@ -207,11 +206,36 @@ describe Board do
           captured_piece=new_board.instance_variable_get(:@captured_piece_color).join
 
           expect(captured_piece).to eq("white")
-
         end
       end
-
     end
 
+  end
+
+  describe "#piece_possible_moves" do
+    let(:board) { described_class.new }
+
+    context "checks a piece's possible movements" do
+
+      let(:knight){[2,0]}
+
+      it "for a knight located at [0,1] the possible moves are:[2,0],[2,2]" do
+        board.add_pieces(Knight,"black",0,1)
+        possible_mvs=board.piece_possible_moves(0,1)
+
+        expect(possible_mvs).to include(knight)
+      end
+
+      it "for a king surrounded by pieces there are no possible moves" do
+        board.add_pieces(King,"black",0,0)
+        board.add_pieces(Knight,"black",0,1)
+        board.add_pieces(Knight,"black",1,0)
+        board.add_pieces(Knight,"black",1,1)
+
+        possible_mvs=board.piece_possible_moves(0,0)
+        
+        expect(possible_mvs).to eq(Array.new)
+      end
+    end
   end
 end
