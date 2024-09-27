@@ -175,6 +175,42 @@ describe Board do
 
       end
 
+      context "checking for the previous position after movement" do
+
+        it "[0,1]-current position should be NIL after movement to [2,0]-next position" do
+          new_board.add_pieces(Knight,"black",0,1)
+          new_board.move_pieces([0,1],[2,0])
+          nil_piece=new_board.pieces[0][1]
+
+          expect(nil_piece).to eq(nil)
+        end
+      end
+
+      context "if a piece is captured on a square,we memorize its color and symbol" do
+
+        it "returns a Queen for a captured piece" do
+          new_board.add_pieces(Bishop,"black",0,2)
+          new_board.add_pieces(Queen,"white",0,3)
+          new_board.move_pieces([0,2],[0,3])
+
+          captured_piece=new_board.instance_variable_get(:@captured_piece_symbol).join
+
+          expect(captured_piece).to eq(" \u2655 ")
+
+        end
+
+        it "returns the Queens color for a captured piece" do
+          new_board.add_pieces(Bishop,"black",0,2)
+          new_board.add_pieces(Queen,"white",0,3)
+          new_board.move_pieces([0,2],[0,3])
+
+          captured_piece=new_board.instance_variable_get(:@captured_piece_color).join
+
+          expect(captured_piece).to eq("white")
+
+        end
+      end
+
     end
 
   end
