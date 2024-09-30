@@ -244,34 +244,54 @@ describe Board do
   let(:board){described_class.new}
 
     context "the king is in check by a Queen" do
+
       it "a white king at [7,1] is threatened by a black Queen at [2,1]" do
         board.add_pieces(King,"white",7,4)
         board.add_pieces(Queen,"black",0,4)
         expect(board.king_in_check?("white")).to eq(true)
       end
 
-      context "the king is in check by a Knight" do
-        it "a white king at [7,4] is threatened by a black Knight at [6,6]" do
-          board.add_pieces(King,"white",7,4)
-          board.add_pieces(Knight,"black",6,6)
-          expect(board.king_in_check?("white")).to eq(true)
-        end
+      it "a white king at [7,4] is threatened by a black Knight at [6,6]" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Knight,"black",6,6)
+        expect(board.king_in_check?("white")).to eq(true)
       end
 
-      context "the king is in check by a Rook" do
-        it "a white king at [7,4] is threatened by a black Rook at [6,4]" do
-          board.add_pieces(King,"white",7,4)
-          board.add_pieces(Rook,"black",6,4)
-          expect(board.king_in_check?("white")).to eq(true)
-        end
+      it "a white king at [7,4] is threatened by a black Rook at [6,4]" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Rook,"black",6,4)
+        expect(board.king_in_check?("white")).to eq(true)
       end
 
+      it "a white king at [7,4] is threatened by a black Bishop at [5,2]" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Bishop,"black",5,2)
+        expect(board.king_in_check?("white")).to eq(true)
+      end
 
-      context "the king is in check by a Bishop" do
-        it "a white king at [7,4] is threatened by a black Bishop at [5,2]" do
+      context "the king is in a safe position" do
+        it "a white king at [7,4] is safe from a black Bishop at [5,3]" do
           board.add_pieces(King,"white",7,4)
-          board.add_pieces(Bishop,"black",5,2)
-          expect(board.king_in_check?("white")).to eq(true)
+          board.add_pieces(Bishop,"black",5,3)
+          expect(board.king_in_check?("white")).to eq(false)
+        end
+
+        it "a white king at [7,4] is safe from a black Queen at [2,3]" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Queen,"black",2,3)
+          expect(board.king_in_check?("white")).to eq(false)
+        end
+  
+        it "a white king at [7,4] is safe from a black Knight at [7,6]" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Knight,"black",7,6)
+          expect(board.king_in_check?("white")).to eq(false)
+        end
+  
+        it "a white king at [7,4] is safe from a black Rook at [6,5]" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Rook,"black",6,5)
+          expect(board.king_in_check?("white")).to eq(false)
         end
       end
     end
