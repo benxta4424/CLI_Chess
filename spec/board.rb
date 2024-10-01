@@ -321,6 +321,16 @@ describe Board do
           expect(board.check_mate?("white")).to eq(true)
         end
       end
+
+      context "if the king can escape there is not a checkmate" do
+
+        it "returns false for a king with a possible escape" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Rook,"black",7,0)
+          
+          expect(board.check_mate?("white")).to eq(false)
+        end
+      end
     end
 
   end
