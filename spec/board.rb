@@ -296,5 +296,20 @@ describe Board do
       end
     end
 
+    describe "check_mate?" do
+
+      let(:board){described_class.new}
+      
+      context "if the king is not even in check,it can't be a checkmate" do
+
+        it "returns false when a king is not in check" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Rook,"black",6,5)
+
+          expect(board.check_mate?("white")).to eq(false)
+        end
+      end
+    end
+
   end
 end
