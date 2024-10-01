@@ -309,6 +309,18 @@ describe Board do
           expect(board.check_mate?("white")).to eq(false)
         end
       end
+
+      context "the king being attacked by two pieces with no way to escape is checkmate" do
+
+        it "returns checkmate for a trapped king" do
+          board.add_pieces(King,"white",7,4)
+          board.add_pieces(Rook,"black",7,0)
+          board.add_pieces(Rook,"black",7,7)
+          board.add_pieces(Queen,"black",6,0)
+
+          expect(board.check_mate?("white")).to eq(true)
+        end
+      end
     end
 
   end
