@@ -332,6 +332,20 @@ describe Board do
         end
       end
     end
+  end
 
+  describe "#stalemate?" do
+    let(:board){described_class.new}
+
+    context "checking for check" do
+
+      it "returns false for a king that's in check" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Rook,"black",7,0)
+        check_stalemate=board.stalemate?("white")
+
+        expect(check_stalemate).to eq(false)
+      end
+    end
   end
 end
