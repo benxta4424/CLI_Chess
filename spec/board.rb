@@ -347,5 +347,27 @@ describe Board do
         expect(check_stalemate).to eq(false)
       end
     end
+
+    context "when the stalemate scenario is true" do
+      it "returns true for a scenario like:w_king[6,6],b_king[4,5],b_queen[0,0],w_pawn[1,1]" do
+        board.add_pieces(King,"white",6,6)
+        board.add_pieces(King,"black",4,5)
+        board.add_pieces(Queen,"black",0,0)
+        board.add_pieces(Pawn,"white",1,1)
+        stalemate_check=board.stalemate?("white")
+
+        expect(stalemate_check).to eq(true)
+      end
+
+      it "stalemate for black:w_king[5,5],b_king[6,6],w_pawn[6,4],w_queen[4,4]" do
+        board.add_pieces(King,"white",5,5)
+        board.add_pieces(King,"black",6,6)
+        board.add_pieces(Queen,"white",4,4)
+        board.add_pieces(Pawn,"white",6,4)
+        stalemate_check=board.stalemate?("white")
+
+        expect(stalemate_check).to eq(true)
+      end
+    end
   end
 end
