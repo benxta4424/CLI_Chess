@@ -396,5 +396,16 @@ describe Board do
       end
     end
 
+    context "no escape route for the king" do
+      it "returns an empty array for no possible escapes" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Rook,"black",7,0)
+        board.add_pieces(Rook,"black",6,0)
+        
+        positions=board.safe_positions_for_the_king("white")
+
+        expect(positions).to eq(Array.new)
+      end
+    end
   end
 end
