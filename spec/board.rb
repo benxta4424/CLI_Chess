@@ -370,4 +370,22 @@ describe Board do
       end
     end
   end
+
+  describe "#safe_positions_for_the_king" do
+    let(:board){described_class.new}
+    let(:expected_output_test1){[[6,4],[6,5],[6,3]]}
+    let(:expected_output_test2){[[6,3],[6,4],[6,5]]}
+
+    context "testing for safe spots" do
+      it "white king at his normal pos surrounded by:queen[7,0]. escape routes:[6,3],[6,4],[6,5]" do
+        board.add_pieces(King,"white",7,4)
+        board.add_pieces(Queen,"black",7,0)
+        positions=board.safe_positions_for_the_king("white")
+
+        expect(positions).to eq(expected_output_test1)
+      end
+
+    end
+
+  end
 end
