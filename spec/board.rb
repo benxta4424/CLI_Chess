@@ -427,4 +427,16 @@ describe Board do
       end
     end
   end
+
+  describe "#check_for_possible_promotions" do
+    context "when black pawn reaches row 7" do
+      it "returns true for black pawn promotion" do
+        # Place a black pawn on row 7 (promotion row)
+        board.pieces[7][3] = Pawn.new("black") # Put a black pawn in column 3 on row 7
+
+        expect(board.check_for_possible_promotions).to be true
+      end
+    end
+end
+
 end
