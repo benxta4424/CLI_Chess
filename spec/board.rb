@@ -437,6 +437,16 @@ describe Board do
         expect(board.check_for_possible_promotions).to be true
       end
     end
+
+    context "when white pawn reaches row 0" do
+      it "returns true for white pawn promotion" do
+        # Place a white pawn on row 0 (promotion row)
+        board.pieces[0][4] = Pawn.new("white") # Put a white pawn in column 4 on row 0
+
+        expect(board.check_for_possible_promotions).to be true
+      end
+    end
+
 end
 
 end
