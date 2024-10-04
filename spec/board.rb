@@ -408,4 +408,23 @@ describe Board do
       end
     end
   end
+
+  describe "#captured_pieces_per_player" do
+    let(:board){described_class.new}
+    let(:first_test){[" \u265F "," \u265B "]}
+
+    context "captured pieces" do
+      it "returns blacks's lost pieces" do
+        board.add_pieces(Queen,"black",1,1)
+        board.add_pieces(Pawn,"black",2,2)
+        board.add_pieces(Queen,"white",2,1)
+
+        board.move_pieces([2,1],[2,2])
+        board.move_pieces([2,1],[1,1])
+        solution=board.captured_pieces_per_player("black")
+
+        expect(solution).to eq(first_test)
+      end
+    end
+  end
 end
