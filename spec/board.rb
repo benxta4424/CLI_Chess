@@ -446,7 +446,26 @@ describe Board do
         expect(board.check_for_possible_promotions).to be true
       end
     end
+    context "when no pawns are on promotion rows" do
+      it "returns false when there are no pawns in the promotion rank" do
+        # No pawns in row 7 (black promotion) or row 0 (white promotion)
+        board.pieces[7][3] = nil # No piece in row 7, column 3
+        board.pieces[0][4] = nil # No piece in row 0, column 4
 
+        expect(board.check_for_possible_promotions).to be false
+      end
+    end
+
+    context "when other pieces are on promotion rows" do
+      it "returns false for non-pawn pieces on promotion rows" do
+        # Place a non-pawn piece (e.g., a knight) on row 7 and row 0
+        board.pieces[7][3] = Knight.new("black") # A knight in row 7, column 3
+        board.pieces[0][4] = Rook.new("white")   # A rook in row 0, column 4
+
+        expect(board.check_for_possible_promotions).to be false
+      end
+    end
+  end
 end
 
 end
