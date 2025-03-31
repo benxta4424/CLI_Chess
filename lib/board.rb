@@ -94,9 +94,13 @@ class Board
 
   def add_pieces(piece_class, piece_type, add_x, add_y)
     # black_rooks
+    if is_legal?(add_x,add_y)
     first_black_rook = piece_class.new(piece_type)
     @pieces[add_x][add_y] = first_black_rook
     board[add_x][add_y] = first_black_rook.symbol.colorize(background: color_piece(add_x, add_y))
+    else
+      return nil
+    end
   end
 
   def move_pieces(old_position, new_position)
@@ -129,6 +133,7 @@ class Board
 
     # deleting the old piece from the board
     delete_old_pieces_after_moving(old_x, old_y)
+
   end
 
   def delete_old_pieces_after_moving(old_x, old_y)
@@ -406,31 +411,27 @@ class Board
 
   def check_for_possible_promotions
     0.upto(7) do |counter|
-      current_piece=@pieces[7][counter]
+      current_piece = @pieces[7][counter]
 
-      if current_piece.is_a?(Pawn) && current_piece.color == "black"
-        return true
-      else
-        next
-      end
+      return true if current_piece.is_a?(Pawn) && current_piece.color == "black"
+
+      next
     end
 
-    #white pawn promotion
+    # white pawn promotion
     7.downto(0) do |counter|
-      current_piece=@pieces[0][counter]
+      current_piece = @pieces[0][counter]
 
-      if current_piece.is_a?(Pawn) && current_piece.color == "white"
-        return true
-      else
-        next
-      end
+      return true if current_piece.is_a?(Pawn) && current_piece.color == "white"
+
+      next
     end
 
     false
   end
 
   def promoting_pawns
-    option=nil
+    option = nil
     puts "Promotiom list:"
     puts "\u0AE7.Queen"
     puts "\u0AE8.Rook"
@@ -438,46 +439,41 @@ class Board
     puts "\u0AEA.Bishop\n\n"
 
     print "Your choice:"
-    option=gets.chomp.to_i
-    
+    option = gets.chomp.to_i
+
     case option
     when 1
-      piece_class=Queen
+      piece_class = Queen
     when 2
-      piece_class=Rook
+      piece_class = Rook
     when 3
-      piece_class=Knight
+      piece_class = Knight
     when 4
-      piece_class=Bishop
+      piece_class = Bishop
     end
-
 
     puts
-    #black pawn promotion
+    # black pawn promotion
     0.upto(7) do |counter|
-      current_piece=@pieces[7][counter]
+      current_piece = @pieces[7][counter]
 
-      if current_piece.is_a?(Pawn) && current_piece.color == "black"
-        add_pieces(piece_class,"black",7,counter)
-        break
-      else
-        next
-      end
+      next unless current_piece.is_a?(Pawn) && current_piece.color == "black"
+
+      add_pieces(piece_class, "black", 7, counter)
+      break
     end
 
-    #white pawn promotion
+    # white pawn promotion
     7.downto(0) do |counter|
-      current_piece=@pieces[0][counter]
+      current_piece = @pieces[0][counter]
 
-      if current_piece.is_a?(Pawn) && current_piece.color == "white"
-        add_pieces(piece_class,"white",0,counter)
-        break
-      else
-        next
-      end
+      next unless current_piece.is_a?(Pawn) && current_piece.color == "white"
+
+      add_pieces(piece_class, "white", 0, counter)
+      break
     end
   end
-
+  
   def play_game
     create_players
     @current_player = @player_one
@@ -490,7 +486,7 @@ class Board
 
       captured_pieces_per_player(@current_player.color_choice)
       puts puts
-      
+
       if stalemate?(@current_player.color_choice)
         puts "The game is a draw!"
         break
@@ -548,7 +544,7 @@ class Board
 
       @current_player = @current_player == @player_one ? @player_two : @player_one
 
-      #check for checkmate after the players's move
+      # check for checkmate after the players's move
       if check_mate?(@current_player.color_choice)
         if @current_player == @player_one
           puts "Player: '#{@player_two.name}' has won via CheckMate!"
