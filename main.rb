@@ -1,3 +1,5 @@
+$stdout.sync = true
+
 require "./lib/board"
 require "./lib/rook"
 require "./lib/knight"
